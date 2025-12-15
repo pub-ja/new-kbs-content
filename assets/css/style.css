@@ -1,0 +1,1174 @@
+/* ============================================
+   KBS contents 2025
+   Base & Reset
+   ============================================ */
+@import url(./fonts.css);
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  line-height: 1.4;
+}
+
+html,
+body {
+  font-family: "Spoqa Han Sans Neo", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background-color: #fff;
+  color: #000;
+  word-break: keep-all;
+}
+
+/* 스크롤바 거의 안보이게 - 동작은 유지 */
+body::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+
+ol,
+ul {
+  list-style: none;
+}
+
+blockquote,
+q {
+  quotes: none;
+}
+
+blockquote:before,
+blockquote:after,
+q:before,
+q:after {
+  content: "";
+  content: none;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+input,
+textarea,
+select {
+  border: none;
+  outline: none;
+  font-family: inherit;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ============================================
+   Container
+   ============================================ */
+.contents-all-wrap {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  background-color: #fff;
+}
+
+/* ============================================
+   Visual Section (헤더)
+   ============================================ */
+.cnt-visual-section {
+  position: relative;
+  width: 100%;
+  height: 600px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cnt-visual-video {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 100%;
+  min-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: cover;
+  z-index: 1;
+}
+
+.cnt-visual-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7));
+  z-index: 2;
+}
+
+.cnt-visual-content {
+  position: relative;
+  z-index: 3;
+  text-align: center;
+  color: #fff;
+  padding: 0 20px;
+}
+
+.cnt-visual-content__heading {
+  font-size: 48px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  line-height: 1.3;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.cnt-visual-content__desc {
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.6;
+  opacity: 0.95;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* ============================================
+   Main Content
+   ============================================ */
+.cnt-main-content {
+  width: 100%;
+  padding: 0;
+}
+
+/* ============================================
+   Tab Navigation
+   ============================================ */
+.cnt-main-tab {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #2a5298;
+  border-bottom: 2px solid #1e3c72;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.cnt-main-tab__button {
+  flex: 1;
+  max-width: 300px;
+  padding: 18px 32px;
+  font-size: 16px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  background-color: transparent;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.cnt-main-tab__button:hover {
+  color: #fff;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.cnt-main-tab__button.active {
+  color: #fff;
+  border-bottom-color: #fff;
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ============================================
+   Tab Content
+   ============================================ */
+.cnt-main-tab__content {
+  display: none;
+}
+
+.cnt-main-tab__content.active {
+  display: block;
+}
+
+/* ============================================
+   Main Wrap (지도 + 패널)
+   ============================================ */
+.cnt-main-wrap {
+  position: relative;
+  width: 100%;
+  min-height: 600px;
+}
+
+/* 탭 활성화 시에만 풀 높이 */
+.cnt-main-tab__content.active .cnt-main-wrap {
+  height: 100vh;
+  display: flex;
+}
+
+/* ============================================
+   Map Section
+   ============================================ */
+.cnt-map-section {
+  position: relative;
+  background-color: #191b2e;
+  width: 100%;
+}
+
+.cnt-main-tab__content.active .cnt-map-section {
+  flex: 1;
+  height: 100%;
+}
+
+#map,
+#map-top5,
+#map-videos {
+  width: 100%;
+  height: 100%;
+}
+
+/* ============================================
+   Info Panel (오른쪽 패널)
+   ============================================ */
+.cnt-info-panel {
+  background-color: #ffffff;
+  border-left: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.cnt-main-tab__content.active .cnt-info-panel {
+  width: 400px;
+  height: 100%;
+}
+
+/* ============================================
+   Panel Top (헤더)
+   ============================================ */
+.cnt-panel-top {
+  padding: 24px;
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #2a5298;
+}
+
+.cnt-panel-top__header {
+  font-size: 22px;
+  font-weight: 700;
+  color: #2a5298;
+}
+
+/* ============================================
+   Panel Content Section
+   ============================================ */
+.cnt-panel-content-section {
+  padding: 20px 24px;
+  border-bottom: 1px solid #e9ecef;
+  position: relative;
+  overflow: visible;
+}
+
+.cnt-panel-content {
+  margin-bottom: 16px;
+}
+
+.cnt-panel-content__title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 12px;
+}
+
+/* ============================================
+   Current Typhoon (현재 태풍)
+   ============================================ */
+.cnt-current-typhoon {
+  background-color: #fff;
+}
+
+.cnt-current-typhoon-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background-color: #f0f7ff;
+  border-left: 4px solid #2a5298;
+  border-radius: 4px;
+}
+
+.cnt-typhoon-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  background-color: #ff4444;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+.cnt-typhoon-number {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.cnt-panel-text {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
+  text-align: center;
+  padding: 12px 0;
+}
+
+/* ============================================
+   Panel Select (셀렉트 박스)
+   ============================================ */
+.cnt-panel-select-wrapper {
+  margin-bottom: 16px;
+  position: relative;
+  z-index: 10;
+}
+
+/* 일반 select 요소 */
+.cnt-current-typhoon select,
+select {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+}
+
+.cnt-current-typhoon select:hover,
+select:hover {
+  border-color: #2a5298;
+}
+
+.cnt-current-typhoon select:focus,
+select:focus {
+  border-color: #2a5298;
+  box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.1);
+}
+
+/* 커스텀 셀렉트 */
+.custom-select {
+  position: relative;
+  width: 100%;
+}
+
+.select-trigger {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.select-trigger:hover {
+  border-color: #2a5298;
+}
+
+.custom-select.open .select-trigger {
+  border-color: #2a5298;
+  box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.1);
+}
+
+.select-text {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.select-arrow {
+  font-size: 10px;
+  color: #666;
+  transition: transform 0.3s ease;
+}
+
+.custom-select.open .select-arrow {
+  transform: rotate(180deg);
+}
+
+.select-options {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 100%;
+  max-height: 280px;
+  overflow-y: auto;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 9999;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+}
+
+.custom-select.open .select-options {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* 드롭다운이 위로 열리는 경우 */
+.custom-select.open-upward .select-options {
+  top: auto;
+  bottom: calc(100% + 4px);
+  transform: translateY(10px);
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.custom-select.open-upward.open .select-options {
+  transform: translateY(0);
+}
+
+.select-option {
+  padding: 12px 16px;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.select-option:hover {
+  background-color: #f0f7ff;
+  color: #2a5298;
+}
+
+.color-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.option-text {
+  flex: 1;
+}
+
+/* 커스텀 스크롤바 for select options */
+.select-options::-webkit-scrollbar {
+  width: 6px;
+}
+
+.select-options::-webkit-scrollbar-track {
+  background-color: #f1f1f1;
+  border-radius: 3px;
+}
+
+.select-options::-webkit-scrollbar-thumb {
+  background-color: #2a5298;
+  border-radius: 3px;
+}
+
+.select-options::-webkit-scrollbar-thumb:hover {
+  background-color: #1e3c72;
+}
+
+/* ============================================
+   Panel Text Box (태풍 설명)
+   ============================================ */
+.cnt-panel-text-box {
+  display: none;
+  margin-top: 16px;
+  padding: 16px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.cnt-panel-text-box.active {
+  display: block;
+}
+
+.cnt-panel-text-box__content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cnt-panel-text-box .cnt-panel-text {
+  font-size: 14px;
+  color: #555;
+  line-height: 1.7;
+  text-align: left;
+  padding: 0;
+}
+
+/* ============================================
+   TOP 5 List
+   ============================================ */
+.cnt-top5-list {
+  padding: 0 24px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cnt-top5-list__item {
+  padding: 16px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #ccc;
+  transition: all 0.3s ease;
+}
+
+.cnt-top5-list__item:hover {
+  background-color: #e9ecef;
+  transform: translateX(4px);
+}
+
+.cnt-top5-list__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.cnt-top5-list__rank {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.cnt-top5-list__name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+.cnt-top5-list__value {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2a5298;
+  margin-top: 4px;
+}
+
+/* ============================================
+   Panel Tab (영상 탭)
+   ============================================ */
+.cnt-panel-tab {
+  display: flex;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.cnt-panel-tab__button {
+  flex: 1;
+  padding: 14px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #666;
+  background-color: transparent;
+  border-bottom: 2px solid transparent;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.cnt-panel-tab__button:hover {
+  color: #2a5298;
+  background-color: rgba(42, 82, 152, 0.05);
+}
+
+.cnt-panel-tab__button.active {
+  color: #2a5298;
+  background-color: #fff;
+  border-bottom-color: #2a5298;
+}
+
+.cnt-panel-tab__content {
+  padding: 24px;
+}
+
+.cnt-panel-tab__content p {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
+}
+
+/* ============================================
+   Video Markers
+   ============================================ */
+.video-marker {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.video-marker.approaching {
+  background-color: #ffa500;
+}
+
+.video-marker.damage {
+  background-color: #ff4444;
+}
+
+.video-marker:hover {
+  transform: scale(1.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* ============================================
+   Map Popup Panel (지도 팝업)
+   ============================================ */
+.map-popup-panel {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 400px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.panel-close-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  font-size: 24px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 1;
+}
+
+.panel-close-btn:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+  transform: rotate(90deg);
+}
+
+.popup-content-wrapper {
+  padding: 24px;
+}
+
+.popup-header {
+  margin-bottom: 20px;
+}
+
+.popup-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #2a5298;
+}
+
+.popup-body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.popup-image {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+}
+
+.typhoon-icon-large {
+  font-size: 80px;
+  line-height: 1;
+}
+
+.popup-info-table {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.popup-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 12px;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+}
+
+.info-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #666;
+  line-height: 1.4;
+}
+
+.info-value {
+  font-size: 15px;
+  font-weight: 700;
+  color: #2a5298;
+  text-align: right;
+}
+
+/* ============================================
+   Responsive - Tablet
+   ============================================ */
+@media (max-width: 1024px) {
+  .cnt-main-tab__content.active .cnt-info-panel {
+    width: 350px;
+  }
+
+  .cnt-visual-content__heading {
+    font-size: 36px;
+  }
+
+  .cnt-visual-content__desc {
+    font-size: 16px;
+  }
+
+  .cnt-main-tab__button {
+    padding: 16px 24px;
+    font-size: 15px;
+  }
+}
+
+/* ============================================
+   Drag Handle (모바일 바텀시트)
+   ============================================ */
+.drag-handle-wrapper {
+  display: none;
+  padding: 12px 0;
+  cursor: grab;
+  text-align: center;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.drag-handle-wrapper:active {
+  cursor: grabbing;
+}
+
+.drag-handle {
+  width: 40px;
+  height: 4px;
+  background-color: #ccc;
+  border-radius: 2px;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .drag-handle-wrapper {
+    display: block;
+  }
+}
+
+/* ============================================
+   Responsive - Mobile
+   ============================================ */
+@media (max-width: 768px) {
+  .cnt-visual-section {
+    height: 400px;
+  }
+
+  .cnt-visual-content__heading {
+    font-size: 28px;
+  }
+
+  .cnt-visual-content__desc {
+    font-size: 14px;
+  }
+
+  .cnt-main-tab {
+    flex-direction: row;
+    overflow-x: auto;
+  }
+
+  .cnt-main-tab__button {
+    flex: 1;
+    min-width: 120px;
+    padding: 14px 16px;
+    font-size: 14px;
+  }
+
+  /* 모바일 Flexbox 레이아웃 */
+  .cnt-main-wrap {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 61px);
+  }
+
+  .cnt-main-tab__content.active .cnt-main-wrap {
+    height: calc(100vh - 61px);
+  }
+
+  .cnt-map-section {
+    flex: 1 1 auto;
+    width: 100%;
+    min-height: 0;
+    position: relative;
+  }
+
+  #map,
+  #map-top5,
+  #map-videos {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .cnt-info-panel,
+  .cnt-main-tab__content.active .cnt-info-panel {
+    flex-shrink: 0;
+    width: 100%;
+    height: 220px;
+    min-height: 150px;
+    max-height: 80vh;
+    border-left: none;
+    border-top: none;
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.25);
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* 모바일 패널 순서 조정 */
+  .cnt-info-panel .cnt-panel-top {
+    order: 1;
+  }
+
+  .cnt-info-panel .cnt-panel-content-section:has(.cnt-panel-select-wrapper) {
+    order: 2;
+    overflow: visible;
+  }
+
+  .cnt-info-panel .cnt-panel-content-section:not(:has(.cnt-panel-select-wrapper)) {
+    order: 3;
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .cnt-info-panel .cnt-top5-list {
+    order: 4;
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .cnt-panel-top__header {
+    font-size: 18px;
+  }
+
+  .cnt-panel-content-section {
+    padding: 16px 20px;
+  }
+
+  .cnt-top5-list {
+    padding: 0 20px 20px;
+  }
+
+  .map-popup-panel {
+    width: 95%;
+    max-width: 350px;
+  }
+
+  .popup-title {
+    font-size: 18px;
+  }
+
+  .typhoon-icon-large {
+    font-size: 60px;
+  }
+}
+
+/* ============================================
+   Mapbox Controls Customization
+   ============================================ */
+.mapboxgl-ctrl-group {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+}
+
+.mapboxgl-ctrl-group button {
+  width: 36px !important;
+  height: 36px !important;
+}
+
+.mapboxgl-ctrl-zoom-in,
+.mapboxgl-ctrl-zoom-out,
+.mapboxgl-ctrl-compass {
+  border-radius: 0 !important;
+}
+
+.mapboxgl-ctrl-group button:hover {
+  background-color: rgba(42, 82, 152, 0.1) !important;
+}
+
+/* Scale Control */
+.mapboxgl-ctrl-scale {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  border: 2px solid #2a5298 !important;
+  border-top: none !important;
+  color: #2a5298 !important;
+  font-weight: 600 !important;
+  padding: 2px 8px !important;
+  border-radius: 0 0 4px 4px !important;
+}
+
+/* ============================================
+   Animations
+   ============================================ */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cnt-panel-text-box.active {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.cnt-typhoon-badge {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* ============================================
+   Scrollbar Styling
+   ============================================ */
+.cnt-info-panel::-webkit-scrollbar {
+  width: 8px;
+}
+
+.cnt-info-panel::-webkit-scrollbar-track {
+  background-color: #f1f1f1;
+}
+
+.cnt-info-panel::-webkit-scrollbar-thumb {
+  background-color: #2a5298;
+  border-radius: 4px;
+}
+
+.cnt-info-panel::-webkit-scrollbar-thumb:hover {
+  background-color: #1e3c72;
+}
+
+/* ============================================
+   Print Styles
+   ============================================ */
+@media print {
+  .cnt-visual-section,
+  .cnt-main-tab {
+    display: none;
+  }
+
+  .cnt-main-wrap {
+    height: auto;
+  }
+
+  .cnt-info-panel {
+    width: 100%;
+    border: 1px solid #ddd;
+  }
+}
+
+/* ============================================
+   Video Slider (Slick Slider)
+   ============================================ */
+.video-slider {
+  padding: 20px;
+}
+
+.video-slide-item {
+  padding: 0 10px;
+  outline: none;
+}
+
+.video-slide-link {
+  display: block;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  color: inherit;
+}
+
+.video-slide-link:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.video-slide-thumbnail {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%; /* 16:9 비율 */
+  background: #f0f0f0;
+  overflow: hidden;
+}
+
+.video-slide-thumbnail img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.video-slide-number {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 30px;
+  height: 30px;
+  background: rgba(42, 82, 152, 0.9);
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.video-slide-info {
+  padding: 16px;
+}
+
+.video-slide-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.video-slide-date {
+  font-size: 12px;
+  color: #999;
+}
+
+/* Slick Slider 커스터마이징 */
+.video-slider .slick-dots {
+  bottom: -40px;
+}
+
+.video-slider .slick-dots li button:before {
+  font-size: 10px;
+  color: #2a5298;
+}
+
+.video-slider .slick-dots li.slick-active button:before {
+  color: #2a5298;
+}
+
+.video-slider .slick-prev,
+.video-slider .slick-next {
+  width: 40px;
+  height: 40px;
+  z-index: 10;
+}
+
+.video-slider .slick-prev {
+  left: -10px;
+}
+
+.video-slider .slick-next {
+  right: -10px;
+}
+
+.video-slider .slick-prev:before,
+.video-slider .slick-next:before {
+  font-size: 32px;
+  color: #2a5298;
+}
+
+/* 모바일 슬라이더 조정 */
+@media (max-width: 768px) {
+  .video-slider {
+    padding: 16px;
+  }
+
+  .video-slide-item {
+    padding: 0 5px;
+  }
+
+  .video-slider .slick-prev {
+    left: 0;
+  }
+
+  .video-slider .slick-next {
+    right: 0;
+  }
+}

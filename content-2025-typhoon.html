@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>한반도 역대 태풍 모아보기</title>
+
+	<!-- Mapbox GL JS -->
+	<link href='https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css' rel='stylesheet' />
+	<script src='https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js'></script>
+
+	<!-- Slick Slider -->
+	<!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css"> -->
+
+	<!-- jQuery (required for Slick) -->
+	<!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script> -->
+
+	<!-- style css -->
+	<link rel="stylesheet" href="./assets/css/style.css">
+
+</head>
+
+<body>
+	<div id="container" class="contents-all-wrap">
+		<!-- 헤더 -->
+		<div class="cnt-visual-section">
+			<!-- 비디오 배경 -->
+			<video class="cnt-visual-video" autoplay muted loop playsinline preload="auto">
+				<source src="./assets/images/video/visual_hurricane_storm.webm" type="video/webm">
+				<source src="./assets/images/video/visual_hurricane_storm.mp4" type="video/mp4">
+			</video>
+			<div class="cnt-visual-overlay"></div>
+			<div class="cnt-visual-content">
+				<h2 class="cnt-visual-content__heading">지도로 되짚어보는<br>역대 한반도 태풍</h2>
+				<p class="cnt-visual-content__desc">위력적인 태풍이 한반도를 지나간 경로, 당시의 현장 기록, 피해 상황을
+					인터랙티브 지도로 확인하세요.</p>
+			</div>
+		</div>
+
+		<!-- 메인 컨텐츠 -->
+		<div class="cnt-main-content">
+			<!-- 탭 네비게이션 -->
+			<div class="cnt-main-tab" id="tabNavigation">
+				<button class="cnt-main-tab__button active" data-tab="tabTyphoon1">역대 태풍</button>
+				<button class="cnt-main-tab__button" data-tab="tabTyphoon2">역대 태풍 TOP 5</button>
+				<button class="cnt-main-tab__button" data-tab="tabTyphoon3">태풍 영상</button>
+			</div>
+
+			<!-- 탭1: 역대 태풍 -->
+			<div class="cnt-main-tab__content active" id="tabTyphoon1">
+				<div class="cnt-main-wrap">
+					<!-- 지도 영역 -->
+					<div class="cnt-map-section">
+						<div id="map"></div>
+					</div>
+
+					<!-- 정보 패널 -->
+					<div class="cnt-info-panel">
+						<div class="cnt-panel-top">
+							<h2 class="cnt-panel-top__header">태풍 정보</h2>
+						</div>
+
+						<!-- 현재 진행 중인 태풍 -->
+						<div class="cnt-panel-content-section">
+							<div class="cnt-panel-content">
+								<h3 class="cnt-panel-content__title">현재 진행 중인 태풍</h3>
+							</div>
+							<div id="current-typhoon-section" class="cnt-current-typhoon">
+								<div class="cnt-current-typhoon-item">
+									<span class="cnt-typhoon-badge">진행중</span>
+									<span class="cnt-typhoon-number">2025년 제 18호 제비(JEBI)</span>
+								</div>
+							</div>
+						</div>
+
+						<!-- 역대 주요 태풍 -->
+						<div class="cnt-panel-content-section">
+							<div class="cnt-panel-content">
+								<h3 class="cnt-panel-content__title">역대 주요 태풍</h3>
+							</div>
+							<div class="cnt-panel-select-wrapper">
+								<div class="custom-select" id="typhoon-select">
+									<div class="select-trigger">
+										<span class="select-text">태풍을 선택하세요</span>
+										<span class="select-arrow">▼</span>
+									</div>
+									<div class="select-options">
+										<div class="select-option" data-value="0">
+											<span class="color-indicator" style="background-color: #FFA07A"></span>
+											<span class="option-text">사라 (1959)</span>
+										</div>
+										<div class="select-option" data-value="1">
+											<span class="color-indicator" style="background-color: #4ECDC4"></span>
+											<span class="option-text">루사 (2002)</span>
+										</div>
+										<div class="select-option" data-value="2">
+											<span class="color-indicator" style="background-color: #FF6B6B"></span>
+											<span class="option-text">매미 (2003)</span>
+										</div>
+										<div class="select-option" data-value="3">
+											<span class="color-indicator" style="background-color: #74B9FF"></span>
+											<span class="option-text">사오마이 (2006)</span>
+										</div>
+										<div class="select-option" data-value="4">
+											<span class="color-indicator" style="background-color: #FF9CEE"></span>
+											<span class="option-text">나리 (2007)</span>
+										</div>
+										<div class="select-option" data-value="5">
+											<span class="color-indicator" style="background-color: #95E1D3"></span>
+											<span class="option-text">곤파스 (2010)</span>
+										</div>
+										<div class="select-option" data-value="6">
+											<span class="color-indicator" style="background-color: #A78BFA"></span>
+											<span class="option-text">볼라벤 (2012)</span>
+										</div>
+										<div class="select-option" data-value="7">
+											<span class="color-indicator" style="background-color: #FFD93D"></span>
+											<span class="option-text">차바 (2016)</span>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div id="selected-typhoon-info" class="cnt-panel-text-box">
+								<div class="cnt-panel-text-box__content">
+									<p class="cnt-panel-text">1959년 태풍 사라는 관측 이래 최대 규모의 태풍으로, 최저기압 950hPa와 초속 85m/sec의 강풍 및 폭우로 한반도에 막대한
+										피해를 입혔습니다.</p>
+									<p class="cnt-panel-text">이 태풍은 849명의 인명피해와 850억 원의 재산피해를 가져왔으며, 당시 가장 큰 재난으로 남아있습니다.</p>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- 컨텐츠 타이틀 -->
+					<div class=""></div>
+				</div>
+			</div>
+
+			<!-- 탭2: 역대 태풍 TOP 5 -->
+			<div class="cnt-main-tab__content" id="tabTyphoon2">
+				<div class="cnt-main-wrap">
+					<!-- 지도 영역 -->
+					<div class="cnt-map-section">
+						<div id="map-top5"></div>
+					</div>
+
+					<!-- 정보 패널 -->
+					<div class="cnt-info-panel">
+						<div class="cnt-panel-top">
+							<h2 class="cnt-panel-top__header">역대 태풍 TOP 5</h2>
+						</div>
+
+						<div class="cnt-panel-content-section">
+							<div class="cnt-panel-content">
+								<h3 class="cnt-panel-content__title">최대 순간 풍속 순위</h3>
+							</div>
+							<div class="cnt-panel-select-wrapper">
+								<div class="custom-select" id="ranking-type-select">
+									<div class="select-trigger">
+										<span class="select-text">최대 순간 풍속</span>
+										<span class="select-arrow">▼</span>
+									</div>
+									<div class="select-options">
+										<div class="select-option" data-value="wind">
+											<span class="option-text">최대 순간 풍속</span>
+										</div>
+										<div class="select-option" data-value="damage">
+											<span class="option-text">피해 재산 순위</span>
+										</div>
+										<div class="select-option" data-value="casualties">
+											<span class="option-text">인명 피해 순위</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div id="topTyphoonList" class="cnt-top5-list">
+							<div class="cnt-top5-list__item">
+								<div class="cnt-top5-list__info">
+									<span class="cnt-top5-list__rank" style="color: #ff4444;">1위</span>
+									<span class="cnt-top5-list__name">매미 (2003년)</span>
+								</div>
+								<div class="cnt-top5-list__value">60.0 m/s</div>
+							</div>
+							<div class="cnt-top5-list__item">
+								<div class="cnt-top5-list__info">
+									<span class="cnt-top5-list__rank" style="color: #ff8800;">2위</span>
+									<span class="cnt-top5-list__name">사라 (1959년)</span>
+								</div>
+								<div class="cnt-top5-list__value">56.7 m/s</div>
+							</div>
+							<div class="cnt-top5-list__item">
+								<div class="cnt-top5-list__info">
+									<span class="cnt-top5-list__rank" style="color: #ffbb00;">3위</span>
+									<span class="cnt-top5-list__name">루사 (2002년)</span>
+								</div>
+								<div class="cnt-top5-list__value">54.2 m/s</div>
+							</div>
+							<div class="cnt-top5-list__item">
+								<div class="cnt-top5-list__info">
+									<span class="cnt-top5-list__rank" style="color: #2a5298;">4위</span>
+									<span class="cnt-top5-list__name">볼라벤 (2012년)</span>
+								</div>
+								<div class="cnt-top5-list__value">52.3 m/s</div>
+							</div>
+							<div class="cnt-top5-list__item">
+								<div class="cnt-top5-list__info">
+									<span class="cnt-top5-list__rank" style="color: #2a5298;">5위</span>
+									<span class="cnt-top5-list__name">차바 (2016년)</span>
+								</div>
+								<div class="cnt-top5-list__value">49.8 m/s</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- 탭3: 태풍 영상 -->
+			<div class="cnt-main-tab__content" id="tabTyphoon3">
+				<div class="cnt-main-wrap">
+					<!-- 지도 영역 -->
+					<div class="cnt-map-section">
+						<div id="map-videos"></div>
+					</div>
+
+					<!-- 정보 패널 -->
+					<div class="cnt-info-panel">
+						<div class="cnt-panel-top">
+							<h2 class="cnt-panel-top__header">역대 태풍 영상</h2>
+						</div>
+
+						<div class="cnt-panel-content-section">
+							<div class="cnt-panel-content">
+								<h3 class="cnt-panel-content__title">영상 기록</h3>
+							</div>
+							<div class="cnt-panel-select-wrapper">
+								<div class="custom-select" id="video-typhoon-select">
+									<div class="select-trigger">
+										<span class="select-text">2025년 제 18호 제비(JEBI)</span>
+										<span class="select-arrow">▼</span>
+									</div>
+									<div class="select-options">
+										<div class="select-option" data-value="jebi">
+											<span class="option-text">2025년 제 18호 제비(JEBI)</span>
+										</div>
+									</div>
+								</div>
+
+								<div class="cnt-panel-tab">
+									<button class="cnt-panel-tab__button active" data-video-type="approaching">업근 기록</button>
+									<button class="cnt-panel-tab__button" data-video-type="damage">피해 기록</button>
+								</div>
+
+								<div class="cnt-panel-tab__content" id="video-info">
+									<div class="video-slider">
+										<!-- 슬라이더 아이템들이 JavaScript로 동적 생성됩니다 -->
+									</div>
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script src="content-2025-typhoon.js"></script>
+</body>
+
+</html>
