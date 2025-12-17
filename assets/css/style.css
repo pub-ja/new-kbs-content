@@ -283,14 +283,13 @@ img {
 }
 
 .cnt-panel-content {
-  margin-bottom: 16px;
+  margin-bottom: 8px;
 }
 
 .cnt-panel-content__title {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 500;
   color: #333;
-  margin-bottom: 8px;
 }
 
 /* ============================================
@@ -339,7 +338,6 @@ img {
    Panel Select (셀렉트 박스)
    ============================================ */
 .cnt-panel-select-wrapper {
-  margin-bottom: 16px;
   position: relative;
   z-index: 10;
 }
@@ -388,7 +386,7 @@ select:focus {
   gap: 8px;
   width: 100%;
   padding: 12px 16px;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
   color: #333;
   background-color: #fff;
@@ -439,7 +437,6 @@ select:focus {
   overflow-y: auto;
   background-color: #fff;
   border: 1px solid #ddd;
-  border-radius: 6px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   z-index: 9999;
   opacity: 0;
@@ -468,7 +465,7 @@ select:focus {
 
 .cnt-custom-select__option {
   padding: 12px 16px;
-  font-size: 14px;
+  font-size: 16px;
   color: #333;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -484,7 +481,6 @@ select:focus {
 
 .cnt-custom-select__option.selected {
   background-color: #e3f2fd;
-  border: 2px solid #2a5298;
   color: #2a5298;
   font-weight: 600;
 }
@@ -553,23 +549,16 @@ select:focus {
    TOP 5 List
    ============================================ */
 .cnt-top5-list {
-  padding: 0 24px 24px;
+  padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  border-bottom: 1px solid #dbdbdb;
 }
 
 .cnt-top5-list__item {
-  padding: 16px;
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  border-left: 4px solid #ccc;
-  transition: all 0.3s ease;
-}
-
-.cnt-top5-list__item:hover {
-  background-color: #e9ecef;
-  transform: translateX(4px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .cnt-top5-list__header {
@@ -602,16 +591,17 @@ select:focus {
    ============================================ */
 .cnt-panel-tab {
   display: flex;
+  margin-top: 15px;
   background-color: #f8f9fa;
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 2px solid #2a5298;
 }
 
 .cnt-panel-tab__button {
   flex: 1;
   padding: 14px 20px;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
-  color: #666;
+  color: #555555;
   background-color: transparent;
   border-bottom: 2px solid transparent;
   transition: all 0.3s ease;
@@ -624,13 +614,9 @@ select:focus {
 }
 
 .cnt-panel-tab__button.active {
-  color: #2a5298;
-  background-color: #fff;
+  color: #fff;
+  background-color: #2a5298;
   border-bottom-color: #2a5298;
-}
-
-.cnt-panel-tab__content {
-  padding: 24px;
 }
 
 .cnt-panel-tab__content p {
@@ -772,11 +758,45 @@ select:focus {
   text-align: right;
 }
 
+.cnt-panel-result {
+  padding: 20px 20px 24px;
+}
+
+.cnt-panel-result__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.cnt-panel-result__title {
+  position: relative;
+  padding-left: 15px;
+  font-size: 16px;
+  color: #222;
+}
+
+.cnt-panel-result__title::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 8px;
+  height: 2px;
+  transform: translateY(-50%);
+  background: #0186c5;
+}
+
+.cnt-panel-reault__top-desc {
+  font-size: 12px;
+  color: #787878;
+}
+
 /* ============================================
    Responsive - Tablet
    ============================================ */
 @media (max-width: 1024px) {
-  .cnt-main-tab__content.active .cnt-info-panel {
+  .cnt-info-panel {
     width: 350px;
   }
 
@@ -832,6 +852,7 @@ select:focus {
   }
 
   .cnt-visual-content__heading {
+    margin-bottom: 10px;
     font-size: 28px;
   }
 
@@ -853,15 +874,21 @@ select:focus {
     border-bottom-width: 1px;
   }
 
+  .cnt-panel-content__title {
+    font-size: 16px;
+  }
+
   /* 모바일 Flexbox 레이아웃 */
   .cnt-main-wrap {
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 52px);
+    height: auto;
+    min-height: calc(100vh - 52px);
   }
 
   .cnt-main-tab__content.active .cnt-main-wrap {
-    height: calc(100vh - 52px);
+    height: auto;
+    min-height: calc(100vh - 52px);
   }
 
   .cnt-map-section {
@@ -881,39 +908,64 @@ select:focus {
     height: 100%;
   }
 
-  .cnt-info-panel,
-  .cnt-main-tab__content.active .cnt-info-panel {
+  .cnt-info-panel {
     position: fixed; /* 뷰포트 기준으로 고정 */
     left: 0;
     right: 0;
     bottom: 0; /* 화면 바닥에 고정 */
     flex-shrink: 0;
     width: 100%;
-    height: 280px;
+    height: auto;
     top: initial;
-    min-height: 220px;
-    max-height: 60vh;
+    min-height: auto;
+    max-height: 70px; /* 초기 축소 상태 */
     border-left: none;
     border-top: none;
     box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.25);
     overflow: visible;
     display: flex;
     flex-direction: column;
-    background-color: #ffffff; /* 바텀시트 전체를 흰 배경으로 */
+    background-color: #ffffff;
     z-index: 20;
+    transition: max-height 0.3s ease;
+  }
+
+  /* 바텀시트 확장 상태 (모바일 전용) */
+  .cnt-info-panel.expanded {
+    min-height: 220px;
+    max-height: 60vh;
+  }
+
+  /* 축소 상태에서는 컨텐츠 숨김 */
+  .cnt-info-panel:not(.expanded) .cnt-panel-content-section,
+  .cnt-info-panel:not(.expanded) .cnt-panel-result,
+  .cnt-info-panel:not(.expanded) .cnt-top5-list {
+    display: none;
   }
 
   .cnt-panel-top {
-    padding: 4px 20px;
+    padding: 4px 20px 15px;
     background: transparent;
+    cursor: pointer;
+    user-select: none;
+    position: relative;
   }
 
   .cnt-panel-top__header {
     font-size: 18px;
   }
 
+  /* 드래그 핸들 - 이벤트 활성화 */
+  .cnt-panel-handle-wrapper {
+    cursor: grab;
+  }
+
+  .cnt-panel-handle-wrapper:active {
+    cursor: grabbing;
+  }
+
   .cnt-panel-content-section {
-    padding: 16px 20px;
+    padding: 5px 20px 16px;
     background: #fff;
   }
 
@@ -932,6 +984,11 @@ select:focus {
 
   .typhoon-icon-large {
     font-size: 60px;
+  }
+
+  .cnt-custom-select__trigger,
+  .cnt-custom-select__option {
+    font-size: 14px;
   }
 }
 
@@ -1006,16 +1063,19 @@ select:focus {
    Video Slider (Swiper)
    ============================================ */
 .cnt-video-slider {
-  padding: 20px;
+  padding: 20px 10px;
 }
 
 .cnt-video-slider__item {
+  display: flex;
+  width: 100%;
   padding: 0 10px;
   outline: none;
 }
 
 .cnt-video-slide__link {
-  display: block;
+  display: flex;
+  flex-direction: column;
   background: #fff;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
@@ -1068,7 +1128,7 @@ select:focus {
 }
 
 .cnt-video-slide__title {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   color: #333;
   margin-bottom: 8px;
@@ -1085,7 +1145,19 @@ select:focus {
 
 /* Swiper 커스터마이징 */
 .cnt-video-slider .cnt-swiper__pagination {
-  bottom: -40px;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  bottom: 0;
+  left: 0;
+}
+
+.cnt-swiper__button-prev,
+.cnt-swiper__button-next {
+  position: absolute;
+  top: 50%;
+  margin-top: -25px;
 }
 
 .cnt-video-slider .swiper-pagination-bullet {
@@ -1133,12 +1205,37 @@ select:focus {
     padding: 0 5px;
   }
 
+  .cnt-video-slide__link {
+    width: 100%;
+    flex: 1;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 15px;
+  }
+
   .cnt-swiper__button-prev {
     left: 0;
   }
 
   .cnt-swiper__button-next {
     right: 0;
+  }
+
+  .cnt-video-slide__thumbnail {
+    flex-shrink: 0;
+    width: 120px;
+    height: 80px;
+    padding-bottom: 0;
+  }
+
+  .cnt-video-slide__title {
+    font-size: 14px;
+  }
+
+  .cnt-video-slide__info {
+    width: 100%;
+    padding: 0 0 0 12px;
   }
 }
 
@@ -1147,10 +1244,12 @@ select:focus {
    ============================================ */
 
 /* 맵 타이틀 (항상 표시) */
-.cnt-map-title {
+.cnt-map-title-wrap {
   position: absolute;
-  top: 20px;
-  left: 20px;
+  display: flex;
+  top: 40px;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 11;
 }
 
@@ -1164,7 +1263,6 @@ select:focus {
 
 /* 맵 오버레이 (토글 버튼 + 컨텐츠) */
 .cnt-map-overlay {
-  position: absolute;
   top: 20px;
   right: 20px;
   z-index: 10;
@@ -1201,6 +1299,7 @@ select:focus {
 }
 
 .cnt-map-overlay__content {
+  position: absolute;
   max-height: 0;
   overflow: hidden;
   transition:
@@ -1241,7 +1340,7 @@ select:focus {
   }
 
   .cnt-map-title__text {
-    font-size: 16px;
+    font-size: 20px;
   }
 
   .cnt-map-overlay {

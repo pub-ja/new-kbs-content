@@ -39,6 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize general UI handlers
   initializeTabNavigation();
   initializeMobileBottomSheetLayout();
+  initializeMobileBottomSheetToggle();
   initMapOverlays();
   initializeTabStickyObserver();
 
@@ -57,6 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   window.addEventListener('resize', () => {
     initializeMobileBottomSheetLayout();
+    initializeMobileBottomSheetToggle();
     updateMapHeight();
   });
 
@@ -73,8 +75,13 @@ document.addEventListener('DOMContentLoaded', () => {
 // ============================================ //
 
 /**
- * Adds a helper class on the active tab content when the tab navigation becomes sticky.
- * This lets CSS make the content area full-height only in the sticky state.
+ * Global state: tracks whether tab navigation is currently in sticky mode
+ */
+let isStickyMode = false;
+
+/**
+ * Observes scroll position to determine sticky state and updates layout accordingly.
+ * Focuses only on state monitoring and visual adjustments (content-full class).
  */
 function initializeTabStickyObserver() {
   const tabNav = document.querySelector('.cnt-main-tab');
@@ -82,24 +89,110 @@ function initializeTabStickyObserver() {
 
   const handleStickyState = () => {
     const isSticky = tabNav.getBoundingClientRect().top <= 0;
-    const activeContent = document.querySelector(
-      '.cnt-main-tab__content.active'
-    );
+    const isMobile = window.innerWidth <= 900;
+
+    // Update global sticky state
+    isStickyMode = isSticky && isMobile;
+
+    const activeContent = document.querySelector('.cnt-main-tab__content.active');
     if (!activeContent) return;
 
+    // Visual state management: add/remove content-full class
     if (isSticky) {
       activeContent.classList.add('content-full');
     } else {
       activeContent.classList.remove('content-full');
     }
+
+    // Panel state management: force expand when sticky, collapse when not
+    if (isMobile) {
+      const panel = activeContent.querySelector('.cnt-info-panel');
+      if (!panel) return;
+
+      if (isSticky && !panel.classList.contains('expanded')) {
+        expandBottomSheet(panel);
+      } else if (!isSticky && panel.classList.contains('expanded')) {
+        collapseBottomSheet(panel);
+      }
+    }
   };
 
-  // 초기 상태 한 번 체크
+  // Initial check
   handleStickyState();
-  // 스크롤 시 상태 업데이트
+
+  // Update on scroll and resize
   window.addEventListener('scroll', () => {
     handleStickyState();
     updateMapHeight();
+  });
+  window.addEventListener('resize', handleStickyState);
+}
+
+/**
+ * Initializes bottom sheet toggle and interaction handlers for mobile.
+ * Centralized event management with state-aware behavior.
+ */
+function initializeMobileBottomSheetToggle() {
+  const isMobile = window.innerWidth <= 900;
+
+  document.querySelectorAll('.cnt-info-panel').forEach((panel) => {
+    const panelTop = panel.querySelector('.cnt-panel-top');
+    const handleWrapper = panel.querySelector('.cnt-panel-handle-wrapper');
+
+    if (!isMobile) {
+      // Desktop: ensure expanded class is removed
+      panel.classList.remove('expanded');
+      return;
+    }
+
+    // Mobile: ensure initial state is collapsed
+    panel.classList.remove('expanded');
+
+    // Mark that listeners have been initialized to prevent duplicates
+    if (panel.dataset.listenersInitialized === 'true') {
+      return;
+    }
+    panel.dataset.listenersInitialized = 'true';
+
+    // 1. Panel top click handler (state-aware)
+    if (panelTop) {
+      panelTop.addEventListener('click', (e) => {
+        // Ignore clicks on drag handle
+        if (handleWrapper && handleWrapper.contains(e.target)) {
+          return;
+        }
+
+        // Only toggle if NOT in sticky mode
+        if (!isStickyMode) {
+          const isExpanded = panel.classList.contains('expanded');
+          if (isExpanded) {
+            collapseBottomSheet(panel);
+          } else {
+            expandBottomSheet(panel);
+          }
+        }
+        // In sticky mode, panel should always stay expanded (do nothing)
+      });
+    }
+
+    // 2. Auto-expand on internal control clicks
+    const customSelects = panel.querySelectorAll('.cnt-custom-select__trigger');
+    customSelects.forEach((trigger) => {
+      trigger.addEventListener('click', (e) => {
+        if (!panel.classList.contains('expanded')) {
+          expandBottomSheet(panel);
+        }
+      }, { capture: true }); // Use capture phase to run before other handlers
+    });
+
+    const panelTabButtons = panel.querySelectorAll('.cnt-panel-tab__button');
+    panelTabButtons.forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        if (!panel.classList.contains('expanded')) {
+          expandBottomSheet(panel);
+        }
+      }, { capture: true }); // Use capture phase to run before other handlers
+    });
   });
 }
 
@@ -299,7 +392,6 @@ function renderTop5List(data) {
 
     if (rankEl) {
       rankEl.textContent = `${typhoon.rank}위`;
-      rankEl.style.color = color;
       // You might need to update class for styling if rank1, rank2 etc classes are used for more than just color
       rankEl.className = `cnt-top5-list__rank rank${typhoon.rank}`;
     }
@@ -309,7 +401,6 @@ function renderTop5List(data) {
     if (valueEl) {
       valueEl.textContent = value;
     }
-    item.style.borderLeft = `4px solid ${color}`;
   });
 }
 
@@ -420,6 +511,27 @@ function switchTab(tabId) {
   document.querySelectorAll('.cnt-main-tab__content').forEach((content) => {
     content.classList.toggle('active', content.id === tabId);
   });
+
+  // 모바일에서 탭 클릭 시 스티키 상태 + 바텀시트 확장
+  if (window.innerWidth <= 900) {
+    const tabNav = document.querySelector('.cnt-main-tab');
+    if (tabNav) {
+      setTimeout(() => {
+        tabNav.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+
+    // 바텀시트도 확장
+    const activeContent = document.querySelector(
+      '.cnt-main-tab__content.active'
+    );
+    if (activeContent) {
+      const panel = activeContent.querySelector('.cnt-info-panel');
+      if (panel && !panel.classList.contains('expanded')) {
+        expandBottomSheet(panel);
+      }
+    }
+  }
 
   // Expand overlay on first visit
   setTimeout(() => {
@@ -593,6 +705,7 @@ function resizeCurrentMap() {
 
 /**
  * Updates map section height based on bottom sheet height.
+ * Optimized with requestAnimationFrame for smooth transitions.
  */
 function updateMapHeight() {
   if (window.innerWidth > 900) {
@@ -638,6 +751,42 @@ function updateMapHeight() {
 }
 
 /**
+ * Expands the bottom sheet to full height with optimized timing.
+ * Coordinates CSS transitions with map height updates for smooth visuals.
+ */
+function expandBottomSheet(panel) {
+  panel.classList.add('expanded');
+
+  // 탭을 sticky 상태로 만들기 위해 스크롤을 최상단으로 이동
+  const visualSection = document.querySelector('.cnt-visual');
+  if (visualSection) {
+    // visual 영역이 있으면 visual 아래(탭 위치)로 스크롤
+    const tabNav = document.querySelector('.cnt-main-tab');
+    if (tabNav) {
+      tabNav.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  // CSS transition duration (300ms) 후 맵 높이 업데이트
+  // 추가로 10ms 버퍼를 둬서 CSS transition이 완전히 끝난 후 실행
+  setTimeout(() => {
+    updateMapHeight();
+  }, 310);
+}
+
+/**
+ * Collapses the bottom sheet to show only panel-top with optimized timing.
+ */
+function collapseBottomSheet(panel) {
+  panel.classList.remove('expanded');
+
+  // CSS transition duration (300ms) 후 맵 높이 업데이트
+  setTimeout(() => {
+    updateMapHeight();
+  }, 310);
+}
+
+/**
  * Initializes the draggable bottom sheet layout for mobile viewports.
  */
 function initializeMobileBottomSheetLayout() {
@@ -655,6 +804,12 @@ function initializeMobileBottomSheetLayout() {
     let initialY, initialHeight;
     const onDragStart = (e) => {
       e.preventDefault();
+      // 드래그 시작 시 확장 상태로 전환
+      if (!panel.classList.contains('expanded')) {
+        expandBottomSheet(panel);
+        return; // 첫 드래그는 확장만 하고 종료
+      }
+
       panel.style.transition = 'none';
       initialY = e.pageY || e.touches[0].pageY;
       initialHeight = panel.offsetHeight;
@@ -670,9 +825,14 @@ function initializeMobileBottomSheetLayout() {
       const deltaY = currentY - initialY;
       let newHeight = initialHeight - deltaY;
 
-      const minHeight = parseFloat(getComputedStyle(panel).minHeight) || 100;
-      const maxHeight = window.innerHeight * 0.6; // 사용자가 60vh로 변경함
-      panel.style.height = `${Math.max(minHeight, Math.min(newHeight, maxHeight))}px`;
+      const minHeight = 70; // collapsed 높이
+      const maxHeight = window.innerHeight * 0.6;
+      const calculatedHeight = Math.max(
+        minHeight,
+        Math.min(newHeight, maxHeight)
+      );
+
+      panel.style.maxHeight = `${calculatedHeight}px`;
 
       // 바텀시트 높이에 따라 맵 높이 조정
       const activeTab = document.querySelector('.cnt-main-tab__content.active');
@@ -695,7 +855,7 @@ function initializeMobileBottomSheetLayout() {
     };
 
     const onDragEnd = () => {
-      panel.style.transition = 'height 0.3s ease';
+      panel.style.transition = 'max-height 0.3s ease';
       document.removeEventListener('mousemove', onDragMove);
       document.removeEventListener('touchmove', onDragMove);
       document.removeEventListener('mouseup', onDragEnd);
