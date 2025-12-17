@@ -50,11 +50,66 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Set up UI for other tabs, which will be fully initialized on first click
   setupCustomSelect('ranking-type-select', handleRankingTypeChange);
+  // Initialize ranking type select with the first option's text
+  const rankingSelectElement = document.getElementById('ranking-type-select');
+  if (rankingSelectElement) {
+    const firstRankingOption = rankingSelectElement.querySelector(
+      '.cnt-custom-select__option'
+    );
+    if (firstRankingOption) {
+      const firstRankingText = firstRankingOption.querySelector(
+        '.cnt-custom-select__option-text'
+      ).textContent;
+      const selectTriggerTextElement = rankingSelectElement.querySelector(
+        '.cnt-custom-select__text'
+      );
+      if (selectTriggerTextElement) {
+        selectTriggerTextElement.textContent = firstRankingText;
+        firstRankingOption.classList.add('selected');
+        rankingSelectElement
+          .querySelector('.cnt-custom-select__trigger')
+          .classList.add('selected');
+      }
+    }
+  }
   setupCustomSelect('video-typhoon-select', (value) => {
-    console.log('Selected video typhoon:', value);
+    // A typhoon has been selected from the dropdown.
+    // Make the video controls and slider visible, then render the content.
+    const videoControls = document.querySelector(
+      '#tabTyphoon3 .video-controls'
+    );
+    if (videoControls) {
+      videoControls.style.display = 'block';
+    }
+
+    // Render map markers for the selected typhoon (default to 'approaching')
+    if (typeof renderVideoMarkers === 'function') {
+      renderVideoMarkers('approaching');
+    }
+
+    // Programmatically click the 'approaching' tab to trigger initial render
+    const approachingTabButton = document.querySelector(
+      '#tabTyphoon3 .cnt-panel-tab__button[data-video-type="approaching"]'
+    );
+    if (approachingTabButton) {
+      approachingTabButton.click();
+    }
   });
   initializeVideoTabButtons();
-  renderVideoSlider('approaching');
+
+  // Hide video controls initially, they will be shown on select.
+  const videoControls = document.querySelector('#tabTyphoon3 .video-controls');
+  if (videoControls) {
+    videoControls.style.display = 'none';
+  }
+
+  // Set default text for video typhoon select trigger
+  const videoSelectTrigger = document.querySelector(
+    '#video-typhoon-select .cnt-custom-select__text'
+  );
+  if (videoSelectTrigger) {
+    videoSelectTrigger.textContent = '태풍을 선택하세요.';
+  }
 
   window.addEventListener('resize', () => {
     initializeMobileBottomSheetLayout();
@@ -88,13 +143,21 @@ function initializeTabStickyObserver() {
   if (!tabNav) return;
 
   const handleStickyState = () => {
-    const isSticky = tabNav.getBoundingClientRect().top <= 0;
+    // Get computed top value from CSS (sticky position top value)
+    const computedStyle = window.getComputedStyle(tabNav);
+    const stickyTop = parseInt(computedStyle.top) || 0;
+
+    // Check if element has reached its sticky position
+    const rect = tabNav.getBoundingClientRect();
+    const isSticky = rect.top <= stickyTop;
     const isMobile = window.innerWidth <= 900;
 
     // Update global sticky state
     isStickyMode = isSticky && isMobile;
 
-    const activeContent = document.querySelector('.cnt-main-tab__content.active');
+    const activeContent = document.querySelector(
+      '.cnt-main-tab__content.active'
+    );
     if (!activeContent) return;
 
     // Visual state management: add/remove content-full class
@@ -178,20 +241,28 @@ function initializeMobileBottomSheetToggle() {
     // 2. Auto-expand on internal control clicks
     const customSelects = panel.querySelectorAll('.cnt-custom-select__trigger');
     customSelects.forEach((trigger) => {
-      trigger.addEventListener('click', (e) => {
-        if (!panel.classList.contains('expanded')) {
-          expandBottomSheet(panel);
-        }
-      }, { capture: true }); // Use capture phase to run before other handlers
+      trigger.addEventListener(
+        'click',
+        (e) => {
+          if (!panel.classList.contains('expanded')) {
+            expandBottomSheet(panel);
+          }
+        },
+        { capture: true }
+      ); // Use capture phase to run before other handlers
     });
 
     const panelTabButtons = panel.querySelectorAll('.cnt-panel-tab__button');
     panelTabButtons.forEach((btn) => {
-      btn.addEventListener('click', (e) => {
-        if (!panel.classList.contains('expanded')) {
-          expandBottomSheet(panel);
-        }
-      }, { capture: true }); // Use capture phase to run before other handlers
+      btn.addEventListener(
+        'click',
+        (e) => {
+          if (!panel.classList.contains('expanded')) {
+            expandBottomSheet(panel);
+          }
+        },
+        { capture: true }
+      ); // Use capture phase to run before other handlers
     });
   });
 }
@@ -208,28 +279,23 @@ function renderCurrentTyphoon(typhoon) {
   const container = document.getElementById('current-typhoon-section');
   if (!container) return;
 
-  const typhoonNumberEl = container.querySelector('.cnt-typhoon-number');
-  const typhoonBadgeEl = container.querySelector('.cnt-typhoon-badge');
-  const typhoonItem = container.querySelector('.cnt-current-typhoon-item');
+  const typhoonItem = container.querySelector('.cnt-current-typhoon__item');
+  const iconEl = container.querySelector('.cnt-current-typhoon__icon');
+  const textEl = container.querySelector('.cnt-current-typhoon__text');
 
   if (!typhoon) {
-    // Hide badge and update text to show no typhoon
-    if (typhoonBadgeEl) typhoonBadgeEl.style.display = 'none';
-    if (typhoonNumberEl)
-      typhoonNumberEl.textContent = '현재 진행중인 태풍이 없습니다.';
-    if (typhoonItem) typhoonItem.style.display = 'block';
+    // No typhoon: remove active class and update content
+    if (typhoonItem) typhoonItem.classList.remove('active');
+    if (iconEl) iconEl.textContent = '태풍 없음';
+    if (textEl) textEl.textContent = '현재 진행중인 태풍이 없습니다.';
     return;
   }
 
-  if (typhoonNumberEl) {
-    typhoonNumberEl.textContent = `2025년 제 ${typhoon.number}호 ${typhoon.name}`;
-  }
-  if (typhoonBadgeEl) {
-    typhoonBadgeEl.style.display = 'inline-block';
-  }
-  if (typhoonItem) {
-    typhoonItem.style.display = 'flex';
-  }
+  // Active typhoon: add active class and update content
+  if (typhoonItem) typhoonItem.classList.add('active');
+  if (iconEl) iconEl.textContent = '태풍 진행중';
+  if (textEl)
+    textEl.textContent = `2025년 제 ${typhoon.number}호 ${typhoon.name}`;
 }
 
 /**
@@ -367,40 +433,39 @@ function handleRankingTypeChange(type) {
  * @param {Array<Object>} data The sorted and sliced array of top 5 typhoons.
  */
 function renderTop5List(data) {
-  const listItems = document.querySelectorAll(
-    '#topTyphoonList .cnt-top5-list__item'
-  );
-  if (!listItems.length) return;
+  const listContainer = document.getElementById('topTyphoonList');
+  if (!listContainer) return;
 
-  data.forEach((typhoon, index) => {
-    if (index >= listItems.length) return; // Stop if data has more items than list elements
+  listContainer.innerHTML = ''; // Clear the list before rendering
 
-    const item = listItems[index];
-    const rankEl = item.querySelector('.cnt-top5-list__rank');
-    const nameEl = item.querySelector('.cnt-top5-list__name');
-    const valueEl = item.querySelector('.cnt-top5-list__value');
+  data.forEach((typhoon) => {
+    let value, unit;
 
-    const color = top5Colors[index];
-    let value;
     if (currentRankingType === 'wind') {
-      value = `${typhoon.wind} m/s`;
+      value = typhoon.wind.toFixed(1);
+      unit = 'm/s';
     } else if (currentRankingType === 'damage') {
-      value = `${(typhoon.damage / 10000).toFixed(0)}조 ${typhoon.damage % 10000}억 원`;
+      // Value is expected to be in 100 million Won units.
+      value = typhoon.damage.toLocaleString();
+      unit = '억원';
     } else if (currentRankingType === 'casualties') {
-      value = `${typhoon.casualties}명`;
+      value = typhoon.casualties.toLocaleString();
+      unit = '명';
     }
 
-    if (rankEl) {
-      rankEl.textContent = `${typhoon.rank}위`;
-      // You might need to update class for styling if rank1, rank2 etc classes are used for more than just color
-      rankEl.className = `cnt-top5-list__rank rank${typhoon.rank}`;
-    }
-    if (nameEl) {
-      nameEl.textContent = `${typhoon.name} (${typhoon.year}년)`;
-    }
-    if (valueEl) {
-      valueEl.textContent = value;
-    }
+    const listItemHTML = `
+      <li class="cnt-top5-list__item">
+        <div class="cnt-top5-list__info">
+          <span class="cnt-top5-list__rank rank${typhoon.rank}">${typhoon.rank}위</span>
+          <span class="cnt-top5-list__year">${typhoon.year}년</span>
+          <span class="cnt-top5-list__name">${typhoon.name}</span>
+        </div>
+        <div class="cnt-top5-list__value">
+          ${value} <span class="cnt-top5-list__unit">${unit}</span>
+        </div>
+      </li>
+    `;
+    listContainer.innerHTML += listItemHTML;
   });
 }
 
@@ -511,6 +576,27 @@ function switchTab(tabId) {
   document.querySelectorAll('.cnt-main-tab__content').forEach((content) => {
     content.classList.toggle('active', content.id === tabId);
   });
+
+  // Transfer content-full class to new active tab if in sticky mode
+  const tabNav = document.querySelector('.cnt-main-tab');
+  if (tabNav) {
+    const isSticky = tabNav.getBoundingClientRect().top <= 0;
+
+    // Remove content-full from all tabs
+    document.querySelectorAll('.cnt-main-tab__content').forEach((content) => {
+      content.classList.remove('content-full');
+    });
+
+    // Add content-full to new active tab if sticky
+    if (isSticky) {
+      const activeContent = document.querySelector(
+        '.cnt-main-tab__content.active'
+      );
+      if (activeContent) {
+        activeContent.classList.add('content-full');
+      }
+    }
+  }
 
   // 모바일에서 탭 클릭 시 스티키 상태 + 바텀시트 확장
   if (window.innerWidth <= 900) {
@@ -793,6 +879,7 @@ function initializeMobileBottomSheetLayout() {
   if (window.innerWidth > 900) {
     document.querySelectorAll('.cnt-info-panel').forEach((panel) => {
       panel.style.height = ''; // Restore original height
+      panel.style.maxHeight = ''; // Clear maxHeight
     });
     return;
   }

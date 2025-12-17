@@ -59,13 +59,13 @@
         <!-- 탭 네비게이션 -->
         <div class="cnt-main-tab" id="tabNavigation">
           <button class="cnt-main-tab__button active" data-tab="tabTyphoon1">
-            현재 태풍 vs 역대 태풍
+            현재 태풍 vs <span class="mo-block">역대 태풍</span>
           </button>
           <button class="cnt-main-tab__button" data-tab="tabTyphoon2">
-            한반도 역대 태풍
+            한반도 <span class="mo-block">역대 태풍</span>
           </button>
           <button class="cnt-main-tab__button" data-tab="tabTyphoon3">
-            현장 영상으로 보는 역대 태풍
+            현장 영상으로 <span class="mo-block">보는 역대 태풍</span>
           </button>
         </div>
 
@@ -146,29 +146,7 @@
                   <button
                     class="cnt-map-overlay__toggle"
                     aria-label="설명 토글"
-                  >
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 20 20"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <circle
-                        cx="10"
-                        cy="10"
-                        r="9"
-                        stroke="currentColor"
-                        stroke-width="2"
-                      />
-                      <path
-                        d="M10 7V10M10 13H10.01"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                      />
-                    </svg>
-                  </button>
+                  ></button>
                   <div class="cnt-map-overlay__content">
                     <p class="cnt-map-overlay__text">
                       위력적인 태풍이 한반도를 지나간 경로, 당시의 현장 기록,
@@ -189,25 +167,20 @@
               </div>
 
               <!-- 현재 진행 중인 태풍 -->
-              <div class="cnt-panel-content-section">
+              <div class="cnt-panel-content-section current-typhoon">
                 <div class="cnt-panel-content">
                   <h3 class="cnt-panel-content__title">현재 진행 중인 태풍</h3>
                 </div>
                 <div id="current-typhoon-section" class="cnt-current-typhoon">
-                  <!-- 
-                  <p class="cnt-panel-text">현재 진행중인 태풍이 없습니다.</p>
-                  -->
-                  <div class="cnt-current-typhoon-item">
-                    <span class="cnt-typhoon-badge">진행중</span>
-                    <span class="cnt-typhoon-number"
-                      >2025년 제 18호 제비(JEBI)</span
-                    >
+                  <div class="cnt-current-typhoon__item">
+                    <span class="cnt-current-typhoon__icon"></span>
+                    <span class="cnt-current-typhoon__text"></span>
                   </div>
                 </div>
               </div>
 
               <!-- 역대 주요 태풍 -->
-              <div class="cnt-panel-content-section">
+              <div class="cnt-panel-content-section history-typhoon">
                 <div class="cnt-panel-content">
                   <h3 class="cnt-panel-content__title">역대 주요 태풍</h3>
                 </div>
@@ -217,7 +190,7 @@
                       <span class="cnt-custom-select__text"
                         >태풍을 선택하세요</span
                       >
-                      <span class="cnt-custom-select__arrow">▼</span>
+                      <span class="cnt-custom-select__arrow"></span>
                     </div>
                     <div class="cnt-custom-select__options">
                       <div class="cnt-custom-select__option" data-value="0">
@@ -321,29 +294,7 @@
                   <button
                     class="cnt-map-overlay__toggle"
                     aria-label="설명 토글"
-                  >
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 20 20"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <circle
-                        cx="10"
-                        cy="10"
-                        r="9"
-                        stroke="currentColor"
-                        stroke-width="2"
-                      />
-                      <path
-                        d="M10 7V10M10 13H10.01"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                      />
-                    </svg>
-                  </button>
+                  ></button>
                   <div class="cnt-map-overlay__content">
                     <p class="cnt-map-overlay__text">
                       위력적인 태풍이 한반도를 지나간 경로, 당시의 현장 기록,
@@ -363,7 +314,7 @@
                 <h2 class="cnt-panel-top__header">태풍 역대 기록</h2>
               </div>
 
-              <div class="cnt-panel-content-section">
+              <div class="cnt-panel-content-section top5-filter">
                 <div class="cnt-panel-content">
                   <h3 class="cnt-panel-content__title">역대 태풍 TOP 5</h3>
                 </div>
@@ -373,7 +324,7 @@
                       <span class="cnt-custom-select__text"
                         >최대 순간 풍속</span
                       >
-                      <span class="cnt-custom-select__arrow">▼</span>
+                      <span class="cnt-custom-select__arrow"> </span>
                     </div>
                     <div class="cnt-custom-select__options">
                       <div
@@ -405,7 +356,7 @@
                 </div>
               </div>
 
-              <div class="cnt-panel-result">
+              <div class="cnt-panel-result top5-result">
                 <div class="cnt-panel-result__top">
                   <h5 class="cnt-panel-result__title">최대 순간 풍속</h5>
                   <p class="cnt-panel-reault__top-desc">*1950년대 이후</p>
@@ -414,7 +365,8 @@
                   <li class="cnt-top5-list__item">
                     <div class="cnt-top5-list__info">
                       <span class="cnt-top5-list__rank rank1">1위</span>
-                      <span class="cnt-top5-list__name">매미 (2003년)</span>
+                      <span class="cnt-top5-list__year">2003년</span>
+                      <span class="cnt-top5-list__name">매미</span>
                     </div>
                     <div class="cnt-top5-list__value">
                       60.0 <span class="cnt-top5-list__unit">m/s</span>
@@ -423,7 +375,8 @@
                   <li class="cnt-top5-list__item">
                     <div class="cnt-top5-list__info">
                       <span class="cnt-top5-list__rank rank2">2위</span>
-                      <span class="cnt-top5-list__name">사라 (1959년)</span>
+                      <span class="cnt-top5-list__year">2003년</span>
+                      <span class="cnt-top5-list__name">사라</span>
                     </div>
                     <div class="cnt-top5-list__value">
                       56.7 <span class="cnt-top5-list__unit">m/s</span>
@@ -432,7 +385,8 @@
                   <li class="cnt-top5-list__item">
                     <div class="cnt-top5-list__info">
                       <span class="cnt-top5-list__rank rank3">3위</span>
-                      <span class="cnt-top5-list__name">루사 (2002년)</span>
+                      <span class="cnt-top5-list__year">2002년</span>
+                      <span class="cnt-top5-list__name">루사</span>
                     </div>
                     <div class="cnt-top5-list__value">
                       54.2 <span class="cnt-top5-list__unit">m/s</span>
@@ -441,7 +395,8 @@
                   <li class="cnt-top5-list__item">
                     <div class="cnt-top5-list__info">
                       <span class="cnt-top5-list__rank rank4">4위</span>
-                      <span class="cnt-top5-list__name">볼라벤 (2012년)</span>
+                      <span class="cnt-top5-list__year">2012년</span>
+                      <span class="cnt-top5-list__name">볼라벤</span>
                     </div>
                     <div class="cnt-top5-list__value">
                       52.3 <span class="cnt-top5-list__unit">m/s</span>
@@ -450,7 +405,8 @@
                   <li class="cnt-top5-list__item">
                     <div class="cnt-top5-list__info">
                       <span class="cnt-top5-list__rank rank5">5위</span>
-                      <span class="cnt-top5-list__name">차바 (2016년)</span>
+                      <span class="cnt-top5-list__year">2016년</span>
+                      <span class="cnt-top5-list__name">차바</span>
                     </div>
                     <div class="cnt-top5-list__value">
                       49.8 <span class="cnt-top5-list__unit">m/s</span>
@@ -478,29 +434,7 @@
                   <button
                     class="cnt-map-overlay__toggle"
                     aria-label="설명 토글"
-                  >
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 20 20"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <circle
-                        cx="10"
-                        cy="10"
-                        r="9"
-                        stroke="currentColor"
-                        stroke-width="2"
-                      />
-                      <path
-                        d="M10 7V10M10 13H10.01"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                      />
-                    </svg>
-                  </button>
+                  ></button>
                   <div class="cnt-map-overlay__content">
                     <p class="cnt-map-overlay__text">
                       위력적인 태풍이 한반도를 지나간 경로, 당시의 현장 기록,
@@ -520,27 +454,28 @@
                 <h2 class="cnt-panel-top__header">역대 태풍 영상</h2>
               </div>
 
-              <div class="cnt-panel-content-section">
+              <div class="cnt-panel-content-section video-title">
                 <div class="cnt-panel-content">
                   <h3 class="cnt-panel-content__title">영상 기록</h3>
                 </div>
-                <div class="cnt-panel-select-wrapper">
-                  <div class="cnt-custom-select" id="video-typhoon-select">
-                    <div class="cnt-custom-select__trigger">
-                      <span class="cnt-custom-select__text"
+                <div class="cnt-custom-select" id="video-typhoon-select">
+                  <div class="cnt-custom-select__trigger">
+                    <span class="cnt-custom-select__text"
+                      >2025년 제 18호 제비(JEBI)</span
+                    >
+                    <span class="cnt-custom-select__arrow"> </span>
+                  </div>
+                  <div class="cnt-custom-select__options">
+                    <div class="cnt-custom-select__option" data-value="jebi">
+                      <span class="cnt-custom-select__option-text"
                         >2025년 제 18호 제비(JEBI)</span
                       >
-                      <span class="cnt-custom-select__arrow">▼</span>
-                    </div>
-                    <div class="cnt-custom-select__options">
-                      <div class="cnt-custom-select__option" data-value="jebi">
-                        <span class="cnt-custom-select__option-text"
-                          >2025년 제 18호 제비(JEBI)</span
-                        >
-                      </div>
                     </div>
                   </div>
-
+                </div>
+              </div>
+              <div class="cnt-panel-content-section video-controls">
+                <div class="cnt-panel-select-wrapper">
                   <div class="cnt-panel-tab">
                     <button
                       class="cnt-panel-tab__button active"

@@ -1256,7 +1256,7 @@ function initMapVideos() {
 
   mapVideos.on('load', async () => {
     await addBaseLayers(mapVideos);
-    renderVideoMarkers('approaching');
+    // Don't render markers initially - wait for typhoon selection
   });
 
   // 지도 컨트롤 비활성화
@@ -1320,8 +1320,7 @@ function renderVideoMarkers(type) {
     paint: {
       'circle-radius': 20,
       'circle-color': type === 'approaching' ? '#E96B06' : '#DC1011',
-      'circle-stroke-width': 2,
-      'circle-stroke-color': '#fff',
+      'circle-stroke-width': 0,
     },
   });
 
