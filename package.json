@@ -1,0 +1,28 @@
+{
+  "name": "kbs-content-2025",
+  "version": "1.0.0",
+  "description": "",
+  "main": "content-2025-typhoon.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "format": "prettier --write \"**/*.{js,html,css,json,md}\"",
+    "format:check": "prettier --check \"**/*.{js,html,css,json,md}\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pub-ja/new-kbs-content.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pub-ja/new-kbs-content/issues"
+  },
+  "homepage": "https://github.com/pub-ja/new-kbs-content#readme",
+  "devDependencies": {
+    "prettier": "^3.7.4"
+  },
+  "dependencies": {
+    "swiper": "^12.0.3"
+  }
+}

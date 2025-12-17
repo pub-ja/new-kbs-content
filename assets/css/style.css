@@ -13,7 +13,12 @@
 
 html,
 body {
-  font-family: "Spoqa Han Sans Neo", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family:
+    'Spoqa Han Sans Neo',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
   background-color: #fff;
   color: #000;
   word-break: keep-all;
@@ -39,7 +44,7 @@ blockquote:before,
 blockquote:after,
 q:before,
 q:after {
-  content: "";
+  content: '';
   content: none;
 }
 
@@ -87,10 +92,10 @@ img {
 /* ============================================
    Visual Section (헤더)
    ============================================ */
-.cnt-visual-section {
+.cnt-visual {
   position: relative;
   width: 100%;
-  height: 600px;
+  height: 380px;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -98,10 +103,7 @@ img {
 }
 
 .cnt-visual-video {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  position: relative;
   min-width: 100%;
   min-height: 100%;
   width: auto;
@@ -116,12 +118,12 @@ img {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7));
+  background: rgba(16, 16, 36, 0.5);
   z-index: 2;
 }
 
 .cnt-visual-content {
-  position: relative;
+  position: absolute;
   z-index: 3;
   text-align: center;
   color: #fff;
@@ -133,10 +135,11 @@ img {
   font-weight: 700;
   margin-bottom: 20px;
   line-height: 1.3;
-  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+  text-shadow: 0px 0px 2px rgba(0, 0, 0, 0.3);
 }
 
 .cnt-visual-content__desc {
+  max-width: 520px;
   font-size: 18px;
   font-weight: 400;
   line-height: 1.6;
@@ -159,8 +162,9 @@ img {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #2a5298;
-  border-bottom: 2px solid #1e3c72;
+  height: 60px;
+  background-color: #113571;
+  border-bottom: 2px solid #113571;
   position: -webkit-sticky;
   position: sticky;
   top: 0;
@@ -169,26 +173,23 @@ img {
 
 .cnt-main-tab__button {
   flex: 1;
-  max-width: 300px;
-  padding: 18px 32px;
-  font-size: 16px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.7);
+  max-width: 360px;
+  padding: 16px 32px;
+  font-size: 18px;
+  color: #afb7e2;
   background-color: transparent;
-  border-bottom: 3px solid transparent;
+  border-bottom: 2px solid transparent;
   transition: all 0.3s ease;
   cursor: pointer;
 }
 
 .cnt-main-tab__button:hover {
   color: #fff;
-  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .cnt-main-tab__button.active {
   color: #fff;
   border-bottom-color: #fff;
-  background-color: rgba(255, 255, 255, 0.15);
 }
 
 /* ============================================
@@ -196,6 +197,8 @@ img {
    ============================================ */
 .cnt-main-tab__content {
   display: none;
+  position: relative;
+  background: #191b2e;
 }
 
 .cnt-main-tab__content.active {
@@ -242,39 +245,38 @@ img {
    Info Panel (오른쪽 패널)
    ============================================ */
 .cnt-info-panel {
+  position: absolute;
+  top: 80px;
+  right: 5vw;
+  width: 360px;
+  height: auto;
+  min-height: 300px;
   background-color: #ffffff;
   border-left: 1px solid #e0e0e0;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
   box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.cnt-main-tab__content.active .cnt-info-panel {
-  width: 400px;
-  height: 100%;
 }
 
 /* ============================================
    Panel Top (헤더)
    ============================================ */
 .cnt-panel-top {
-  padding: 24px;
-  background-color: #f8f9fa;
-  border-bottom: 2px solid #2a5298;
+  padding: 15px 20px;
+  background-color: #f1f1f1;
 }
 
 .cnt-panel-top__header {
-  font-size: 22px;
-  font-weight: 700;
-  color: #2a5298;
+  font-size: 20px;
+  color: #000;
+  font-weight: 500;
 }
 
 /* ============================================
    Panel Content Section
    ============================================ */
 .cnt-panel-content-section {
-  padding: 20px 24px;
+  padding: 20px 20px 24px;
   border-bottom: 1px solid #e9ecef;
   position: relative;
   overflow: visible;
@@ -286,9 +288,9 @@ img {
 
 .cnt-panel-content__title {
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 500;
   color: #333;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 /* ============================================
@@ -374,55 +376,61 @@ select:focus {
 }
 
 /* 커스텀 셀렉트 */
-.custom-select {
+.cnt-custom-select {
   position: relative;
   width: 100%;
 }
 
-.select-trigger {
+.cnt-custom-select__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
   width: 100%;
   padding: 12px 16px;
   font-size: 14px;
   font-weight: 500;
   color: #333;
   background-color: #fff;
-  border: 1px solid #ddd;
-  border-radius: 6px;
+  border: 1px solid #ccc;
   cursor: pointer;
   transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
 }
 
-.select-trigger:hover {
+.cnt-custom-select__trigger:hover {
   border-color: #2a5298;
 }
 
-.custom-select.open .select-trigger {
+.cnt-custom-select.open .cnt-custom-select__trigger {
   border-color: #2a5298;
   box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.1);
 }
 
-.select-text {
+.cnt-custom-select__trigger.selected {
+  background-color: #e3f2fd;
+  border-color: #2a5298;
+  color: #2a5298;
+  font-weight: 600;
+}
+
+.cnt-custom-select__text {
   flex: 1;
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.select-arrow {
+.cnt-custom-select__arrow {
   font-size: 10px;
   color: #666;
   transition: transform 0.3s ease;
 }
 
-.custom-select.open .select-arrow {
+.cnt-custom-select.open .cnt-custom-select__arrow {
   transform: rotate(180deg);
 }
 
-.select-options {
+.cnt-custom-select__options {
   position: absolute;
   top: calc(100% + 4px);
   left: 0;
@@ -440,25 +448,25 @@ select:focus {
   transition: all 0.3s ease;
 }
 
-.custom-select.open .select-options {
+.cnt-custom-select.open .cnt-custom-select__options {
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
 }
 
 /* 드롭다운이 위로 열리는 경우 */
-.custom-select.open-upward .select-options {
+.cnt-custom-select.open-upward .cnt-custom-select__options {
   top: auto;
   bottom: calc(100% + 4px);
   transform: translateY(10px);
   box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.custom-select.open-upward.open .select-options {
+.cnt-custom-select.open-upward.open .cnt-custom-select__options {
   transform: translateY(0);
 }
 
-.select-option {
+.cnt-custom-select__option {
   padding: 12px 16px;
   font-size: 14px;
   color: #333;
@@ -469,38 +477,45 @@ select:focus {
   gap: 10px;
 }
 
-.select-option:hover {
+.cnt-custom-select__option:hover {
   background-color: #f0f7ff;
   color: #2a5298;
 }
 
-.color-indicator {
+.cnt-custom-select__option.selected {
+  background-color: #e3f2fd;
+  border: 2px solid #2a5298;
+  color: #2a5298;
+  font-weight: 600;
+}
+
+.cnt-color-indicator {
   width: 12px;
   height: 12px;
   border-radius: 50%;
   flex-shrink: 0;
 }
 
-.option-text {
+.cnt-custom-select__option-text {
   flex: 1;
 }
 
 /* 커스텀 스크롤바 for select options */
-.select-options::-webkit-scrollbar {
+.cnt-custom-select__options::-webkit-scrollbar {
   width: 6px;
 }
 
-.select-options::-webkit-scrollbar-track {
+.cnt-custom-select__options::-webkit-scrollbar-track {
   background-color: #f1f1f1;
   border-radius: 3px;
 }
 
-.select-options::-webkit-scrollbar-thumb {
+.cnt-custom-select__options::-webkit-scrollbar-thumb {
   background-color: #2a5298;
   border-radius: 3px;
 }
 
-.select-options::-webkit-scrollbar-thumb:hover {
+.cnt-custom-select__options::-webkit-scrollbar-thumb:hover {
   background-color: #1e3c72;
 }
 
@@ -658,104 +673,102 @@ select:focus {
 /* ============================================
    Map Popup Panel (지도 팝업)
    ============================================ */
-.map-popup-panel {
+.cnt-map-popup-panel {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  /* top, left, transform은 JavaScript에서 동적으로 설정 */
   width: 90%;
-  max-width: 400px;
-  background-color: #fff;
-  border-radius: 12px;
+  max-width: 350px;
+  color: #fff;
+  background-color: #25252b;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   z-index: 1000;
   overflow: hidden;
 }
 
-.panel-close-btn {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background-color: rgba(0, 0, 0, 0.5);
-  color: #fff;
-  font-size: 24px;
-  line-height: 1;
+.cnt-map-popup__btn-close {
   display: flex;
   align-items: center;
   justify-content: center;
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  width: 32px;
+  height: 32px;
   cursor: pointer;
   transition: all 0.3s ease;
   z-index: 1;
+  background: url(../images/icon-close.svg) no-repeat 50% 50%;
 }
 
-.panel-close-btn:hover {
-  background-color: rgba(0, 0, 0, 0.8);
-  transform: rotate(90deg);
+.cnt-map-popup__btn-close:hover {
+  outline: 1px solid #000;
 }
 
-.popup-content-wrapper {
-  padding: 24px;
+.cnt-map-popup__header {
+  padding: 10px 15px 16px;
 }
 
-.popup-header {
-  margin-bottom: 20px;
-}
-
-.popup-title {
-  font-size: 22px;
+.cnt-map-popup__header-title {
+  font-size: 16px;
   font-weight: 700;
-  color: #2a5298;
+  color: #fff;
 }
 
-.popup-body {
+.cnt-map-popup__body {
   display: flex;
-  flex-direction: column;
   gap: 20px;
+  padding: 0 15px 15px;
 }
 
-.popup-image {
+.cnt-map-popup__image {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
-  background-color: #f8f9fa;
-  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+  width: 130px;
+  height: 130px;
 }
 
-.typhoon-icon-large {
-  font-size: 80px;
-  line-height: 1;
+.cnt-map-popup__image > img {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
 }
 
-.popup-info-table {
+.cnt-map-popup__date {
+  font-size: 12px;
+  color: #999;
+  margin-bottom: 10px;
+}
+
+.cnt-map-popup__info-table {
+  width: 100%;
+}
+
+.cnt-map-popup__info-list {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.popup-info-row {
+.cnt-map-popup__info-list > li {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  padding: 12px;
-  background-color: #f8f9fa;
-  border-radius: 6px;
+  align-items: center;
 }
 
-.info-label {
-  font-size: 13px;
+.cnt-map-popup__info-label {
+  font-size: 12px;
   font-weight: 600;
-  color: #666;
+  color: #ccc;
   line-height: 1.4;
 }
 
-.info-value {
-  font-size: 15px;
+.cnt-map-popup__info-value {
+  font-size: 14px;
   font-weight: 700;
-  color: #2a5298;
+  color: #fff;
   text-align: right;
 }
 
@@ -768,36 +781,35 @@ select:focus {
   }
 
   .cnt-visual-content__heading {
-    font-size: 36px;
+    font-size: 42px;
   }
 
   .cnt-visual-content__desc {
     font-size: 16px;
-  }
-
-  .cnt-main-tab__button {
-    padding: 16px 24px;
-    font-size: 15px;
   }
 }
 
 /* ============================================
    Drag Handle (모바일 바텀시트)
    ============================================ */
-.drag-handle-wrapper {
+.cnt-panel-handle-wrapper {
   display: none;
+  position: absolute;
+  top: -23px;
+  left: 0;
+  right: 0;
   padding: 12px 0;
+  border-radius: 8px 8px 0 0;
   cursor: grab;
   text-align: center;
-  background-color: #f8f9fa;
-  border-bottom: 1px solid #e9ecef;
+  background-color: #fff;
 }
 
-.drag-handle-wrapper:active {
+.cnt-panel-handle-wrapper:active {
   cursor: grabbing;
 }
 
-.drag-handle {
+.cnt-drag-handle {
   width: 40px;
   height: 4px;
   background-color: #ccc;
@@ -805,8 +817,8 @@ select:focus {
   margin: 0 auto;
 }
 
-@media (max-width: 768px) {
-  .drag-handle-wrapper {
+@media (max-width: 900px) {
+  .cnt-panel-handle-wrapper {
     display: block;
   }
 }
@@ -814,9 +826,9 @@ select:focus {
 /* ============================================
    Responsive - Mobile
    ============================================ */
-@media (max-width: 768px) {
-  .cnt-visual-section {
-    height: 400px;
+@media (max-width: 900px) {
+  .cnt-visual {
+    height: 240px;
   }
 
   .cnt-visual-content__heading {
@@ -824,37 +836,39 @@ select:focus {
   }
 
   .cnt-visual-content__desc {
+    max-width: 400px;
     font-size: 14px;
   }
 
   .cnt-main-tab {
-    flex-direction: row;
-    overflow-x: auto;
+    height: 52px;
   }
 
   .cnt-main-tab__button {
     flex: 1;
+    height: 52px;
     min-width: 120px;
-    padding: 14px 16px;
+    padding: 6px 16px;
     font-size: 14px;
+    border-bottom-width: 1px;
   }
 
   /* 모바일 Flexbox 레이아웃 */
   .cnt-main-wrap {
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 61px);
+    height: calc(100vh - 52px);
   }
 
   .cnt-main-tab__content.active .cnt-main-wrap {
-    height: calc(100vh - 61px);
+    height: calc(100vh - 52px);
   }
 
   .cnt-map-section {
-    flex: 1 1 auto;
-    width: 100%;
-    min-height: 0;
+    height: auto; /* JavaScript에서 동적으로 설정 */
+    flex: 1; /* 남은 공간을 차지 */
     position: relative;
+    min-height: 200px; /* 최소 높이 보장 */
   }
 
   #map,
@@ -869,42 +883,29 @@ select:focus {
 
   .cnt-info-panel,
   .cnt-main-tab__content.active .cnt-info-panel {
+    position: fixed; /* 뷰포트 기준으로 고정 */
+    left: 0;
+    right: 0;
+    bottom: 0; /* 화면 바닥에 고정 */
     flex-shrink: 0;
     width: 100%;
-    height: 220px;
-    min-height: 150px;
-    max-height: 80vh;
+    height: 280px;
+    top: initial;
+    min-height: 220px;
+    max-height: 60vh;
     border-left: none;
     border-top: none;
-    border-radius: 20px 20px 0 0;
     box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.25);
     overflow: visible;
     display: flex;
     flex-direction: column;
+    background-color: #ffffff; /* 바텀시트 전체를 흰 배경으로 */
+    z-index: 20;
   }
 
-  /* 모바일 패널 순서 조정 */
-  .cnt-info-panel .cnt-panel-top {
-    order: 1;
-  }
-
-  .cnt-info-panel .cnt-panel-content-section:has(.cnt-panel-select-wrapper) {
-    order: 2;
-    overflow: visible;
-  }
-
-  .cnt-info-panel .cnt-panel-content-section:not(:has(.cnt-panel-select-wrapper)) {
-    order: 3;
-    flex: 1;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .cnt-info-panel .cnt-top5-list {
-    order: 4;
-    flex: 1;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+  .cnt-panel-top {
+    padding: 4px 20px;
+    background: transparent;
   }
 
   .cnt-panel-top__header {
@@ -913,6 +914,7 @@ select:focus {
 
   .cnt-panel-content-section {
     padding: 16px 20px;
+    background: #fff;
   }
 
   .cnt-top5-list {
@@ -987,7 +989,8 @@ select:focus {
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
   }
   50% {
@@ -1000,57 +1003,18 @@ select:focus {
 }
 
 /* ============================================
-   Scrollbar Styling
+   Video Slider (Swiper)
    ============================================ */
-.cnt-info-panel::-webkit-scrollbar {
-  width: 8px;
-}
-
-.cnt-info-panel::-webkit-scrollbar-track {
-  background-color: #f1f1f1;
-}
-
-.cnt-info-panel::-webkit-scrollbar-thumb {
-  background-color: #2a5298;
-  border-radius: 4px;
-}
-
-.cnt-info-panel::-webkit-scrollbar-thumb:hover {
-  background-color: #1e3c72;
-}
-
-/* ============================================
-   Print Styles
-   ============================================ */
-@media print {
-  .cnt-visual-section,
-  .cnt-main-tab {
-    display: none;
-  }
-
-  .cnt-main-wrap {
-    height: auto;
-  }
-
-  .cnt-info-panel {
-    width: 100%;
-    border: 1px solid #ddd;
-  }
-}
-
-/* ============================================
-   Video Slider (Slick Slider)
-   ============================================ */
-.video-slider {
+.cnt-video-slider {
   padding: 20px;
 }
 
-.video-slide-item {
+.cnt-video-slider__item {
   padding: 0 10px;
   outline: none;
 }
 
-.video-slide-link {
+.cnt-video-slide__link {
   display: block;
   background: #fff;
   border: 1px solid #e0e0e0;
@@ -1061,12 +1025,12 @@ select:focus {
   color: inherit;
 }
 
-.video-slide-link:hover {
+.cnt-video-slide__link:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   transform: translateY(-2px);
 }
 
-.video-slide-thumbnail {
+.cnt-video-slide__thumbnail {
   position: relative;
   width: 100%;
   padding-bottom: 56.25%; /* 16:9 비율 */
@@ -1074,7 +1038,7 @@ select:focus {
   overflow: hidden;
 }
 
-.video-slide-thumbnail img {
+.cnt-video-slide__thumbnail img {
   position: absolute;
   top: 0;
   left: 0;
@@ -1099,11 +1063,11 @@ select:focus {
   font-weight: 600;
 }
 
-.video-slide-info {
+.cnt-video-slide__info {
   padding: 16px;
 }
 
-.video-slide-title {
+.cnt-video-slide__title {
   font-size: 14px;
   font-weight: 600;
   color: #333;
@@ -1114,61 +1078,194 @@ select:focus {
   overflow: hidden;
 }
 
-.video-slide-date {
+.cnt-video-slide__date {
   font-size: 12px;
   color: #999;
 }
 
-/* Slick Slider 커스터마이징 */
-.video-slider .slick-dots {
+/* Swiper 커스터마이징 */
+.cnt-video-slider .cnt-swiper__pagination {
   bottom: -40px;
 }
 
-.video-slider .slick-dots li button:before {
-  font-size: 10px;
-  color: #2a5298;
+.cnt-video-slider .swiper-pagination-bullet {
+  width: 10px;
+  height: 10px;
+  background-color: #2a5298;
+  opacity: 0.4;
 }
 
-.video-slider .slick-dots li.slick-active button:before {
-  color: #2a5298;
+.cnt-video-slider .swiper-pagination-bullet-active {
+  opacity: 1;
 }
 
-.video-slider .slick-prev,
-.video-slider .slick-next {
+.cnt-swiper__button-prev,
+.cnt-swiper__button-next {
   width: 40px;
   height: 40px;
-  z-index: 10;
-}
-
-.video-slider .slick-prev {
-  left: -10px;
-}
-
-.video-slider .slick-next {
-  right: -10px;
-}
-
-.video-slider .slick-prev:before,
-.video-slider .slick-next:before {
-  font-size: 32px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
   color: #2a5298;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.cnt-swiper__button-prev:after,
+.cnt-swiper__button-next:after {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.cnt-swiper__button-prev {
+  left: 10px;
+}
+
+.cnt-swiper__button-next {
+  right: 10px;
 }
 
 /* 모바일 슬라이더 조정 */
-@media (max-width: 768px) {
-  .video-slider {
+@media (max-width: 900px) {
+  .cnt-video-slider {
     padding: 16px;
   }
 
-  .video-slide-item {
+  .cnt-video-slider__item {
     padding: 0 5px;
   }
 
-  .video-slider .slick-prev {
+  .cnt-swiper__button-prev {
     left: 0;
   }
 
-  .video-slider .slick-next {
+  .cnt-swiper__button-next {
     right: 0;
   }
+}
+
+/* ============================================
+   맵 타이틀 & 오버레이 (Map Title & Overlay)
+   ============================================ */
+
+/* 맵 타이틀 (항상 표시) */
+.cnt-map-title {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 11;
+}
+
+.cnt-map-title__text {
+  font-size: 36px;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* 맵 오버레이 (토글 버튼 + 컨텐츠) */
+.cnt-map-overlay {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 10;
+  max-width: 400px;
+}
+
+.cnt-map-overlay__toggle {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: none;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2a5298;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  margin-left: auto;
+}
+
+.cnt-map-overlay__toggle:hover {
+  background: rgba(255, 255, 255, 1);
+  color: #1a3d73;
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.cnt-map-overlay__toggle svg {
+  width: 24px;
+  height: 24px;
+}
+
+.cnt-map-overlay__content {
+  max-height: 0;
+  overflow: hidden;
+  transition:
+    max-height 0.3s ease,
+    margin-top 0.3s ease;
+  margin-top: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.cnt-main-tab__content.active .cnt-map-overlay .cnt-map-overlay__content {
+  max-height: 500px;
+  margin-top: 12px;
+}
+
+.cnt-main-tab__content.active
+  .cnt-map-overlay.collapsed
+  .cnt-map-overlay__content {
+  max-height: 0 !important;
+  margin-top: 0 !important;
+}
+
+.cnt-map-overlay__text {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #333;
+  margin: 0;
+  padding: 16px 20px;
+}
+
+/* 모바일 스타일 */
+@media (max-width: 900px) {
+  .cnt-map-title {
+    top: 10px;
+    left: 10px;
+  }
+
+  .cnt-map-title__text {
+    font-size: 16px;
+  }
+
+  .cnt-map-overlay {
+    top: 10px;
+    right: 10px;
+    max-width: calc(100% - 20px - 10px - 120px);
+  }
+
+  .cnt-map-overlay__toggle {
+    width: 40px;
+    height: 40px;
+  }
+
+  .cnt-map-overlay__toggle svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .cnt-map-overlay__text {
+    font-size: 13px;
+    padding: 12px 16px;
+  }
+}
+
+.mapboxgl-ctrl-bottom-left {
+  display: none !important;
 }
