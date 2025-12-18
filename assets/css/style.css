@@ -24,7 +24,6 @@ body {
   word-break: keep-all;
 }
 
-/* 스크롤바 거의 안보이게 - 동작은 유지 */
 body::-webkit-scrollbar {
   width: 0px;
   background: transparent;
@@ -268,11 +267,11 @@ img {
    ============================================ */
 .cnt-info-panel {
   position: absolute;
+  z-index: 9;
   top: 120px;
   right: 4vw;
   width: 360px;
   height: auto;
-  min-height: 300px;
   background-color: #ffffff;
   border-left: 1px solid #e0e0e0;
   display: flex;
@@ -568,6 +567,25 @@ select:focus {
   line-height: 1.7;
   text-align: left;
   padding: 0;
+}
+
+/* ============================================
+   TOP 5 Result & Video Controls (동적 생성 컨텐츠)
+   ============================================ */
+.top5-result {
+  display: none;
+}
+
+.top5-result.active {
+  display: block;
+}
+
+.video-controls {
+  display: none;
+}
+
+.video-controls.active {
+  display: block;
 }
 
 /* ============================================
@@ -1028,16 +1046,16 @@ select:focus {
 
   /* 바텀시트 확장 상태 (모바일 전용) */
   .cnt-info-panel.expanded {
-    min-height: 220px;
+    min-height: 90px;
     max-height: 60vh;
   }
 
   /* 축소 상태에서는 컨텐츠 숨김 */
 
   .cnt-info-panel:not(.expanded) .cnt-panel-text-box.active,
-  .cnt-info-panel:not(.expanded) .top5-result,
-  .cnt-info-panel:not(.expanded) .video-controls {
-    display: none;
+  .cnt-info-panel:not(.expanded) .top5-result.active,
+  .cnt-info-panel:not(.expanded) .video-controls.active {
+    display: none !important;
   }
 
   .cnt-panel-top {
@@ -1167,7 +1185,6 @@ select:focus {
 .cnt-video-slider__item {
   display: flex;
   width: 100%;
-  padding: 0 10px;
   outline: none;
 }
 
@@ -1175,6 +1192,7 @@ select:focus {
   display: flex;
   flex-direction: column;
   width: 100%;
+  padding: 20px;
   background: #fff;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
@@ -1192,15 +1210,11 @@ select:focus {
 .cnt-video-slide__thumbnail {
   position: relative;
   width: 100%;
-  padding-bottom: 56.25%; /* 16:9 비율 */
   background: #f0f0f0;
   overflow: hidden;
 }
 
 .cnt-video-slide__thumbnail img {
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -1223,7 +1237,7 @@ select:focus {
 }
 
 .cnt-video-slide__info {
-  padding: 16px;
+  padding: 16px 0 0;
 }
 
 .cnt-video-slide__title {
@@ -1301,7 +1315,6 @@ select:focus {
   }
 
   .cnt-video-slider__item {
-    padding: 0 5px;
   }
 
   .cnt-video-slide__link {
@@ -1362,7 +1375,7 @@ select:focus {
 @media (max-width: 1200px) {
   .cnt-map-title-wrap {
     width: auto;
-    left: 20px;
+    left: 40px;
     transform: translateX(0);
   }
 
@@ -1374,6 +1387,7 @@ select:focus {
 @media (max-width: 900px) {
   .cnt-map-title-wrap {
     top: 20px;
+    gap: 5px;
   }
   .content-full .cnt-map-title-wrap {
     top: 20px;

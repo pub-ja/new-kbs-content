@@ -8,7 +8,7 @@
 // ============================================================
 
 let currentTab = 'tabTyphoon1';
-let currentRankingType = 'wind';
+let currentRankingType = null; // No default selection
 let videoSwiper = null;
 
 // Tracks which tabs have been visited to control overlay behavior
@@ -50,36 +50,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Set up UI for other tabs, which will be fully initialized on first click
   setupCustomSelect('ranking-type-select', handleRankingTypeChange);
-  // Initialize ranking type select with the first option's text
-  const rankingSelectElement = document.getElementById('ranking-type-select');
-  if (rankingSelectElement) {
-    const firstRankingOption = rankingSelectElement.querySelector(
-      '.cnt-custom-select__option'
-    );
-    if (firstRankingOption) {
-      const firstRankingText = firstRankingOption.querySelector(
-        '.cnt-custom-select__option-text'
-      ).textContent;
-      const selectTriggerTextElement = rankingSelectElement.querySelector(
-        '.cnt-custom-select__text'
-      );
-      if (selectTriggerTextElement) {
-        selectTriggerTextElement.textContent = firstRankingText;
-        firstRankingOption.classList.add('selected');
-        rankingSelectElement
-          .querySelector('.cnt-custom-select__trigger')
-          .classList.add('selected');
-      }
-    }
-  }
+  // Do not initialize ranking type select with default selection
   setupCustomSelect('video-typhoon-select', (value) => {
     // A typhoon has been selected from the dropdown.
-    // Make the video controls and slider visible, then render the content.
+    // Make the video controls and slider visible (CSS 클래스로 통일)
     const videoControls = document.querySelector(
       '#tabTyphoon3 .video-controls'
     );
     if (videoControls) {
-      videoControls.style.display = 'block';
+      videoControls.classList.add('active');
     }
 
     // Render map markers for the selected typhoon (default to 'approaching')
@@ -96,12 +75,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
   initializeVideoTabButtons();
-
-  // Hide video controls initially, they will be shown on select.
-  const videoControls = document.querySelector('#tabTyphoon3 .video-controls');
-  if (videoControls) {
-    videoControls.style.display = 'none';
-  }
 
   // Set default text for video typhoon select trigger
   const videoSelectTrigger = document.querySelector(
@@ -399,6 +372,12 @@ function setupTyphoonSelect() {
 function handleRankingTypeChange(type) {
   currentRankingType = type;
 
+  // Show the result panel when a selection is made (CSS 클래스로 통일)
+  const resultPanel = document.querySelector('#tabTyphoon2 .cnt-panel-result');
+  if (resultPanel) {
+    resultPanel.classList.add('active');
+  }
+
   const titleMap = {
     wind: '최대 순간 풍속',
     damage: '재산 피해액',
@@ -634,15 +613,23 @@ function switchTab(tabId) {
 
   // Initialize map if it doesn't exist yet
   if (tabId === 'tabTyphoon2') {
+    // Remove active class if no selection (CSS 클래스로 통일)
+    const resultPanel = document.querySelector('#tabTyphoon2 .cnt-panel-result');
+    if (resultPanel && !currentRankingType) {
+      resultPanel.classList.remove('active');
+    }
+
     if (!mapTop5) {
       initMapTop5(() => {
-        // 맵 로드 후 약간의 지연을 두고 초기 데이터 렌더링
-        setTimeout(() => {
-          handleRankingTypeChange(currentRankingType);
-        }, 100);
+        // Only render data if a ranking type has been selected
+        if (currentRankingType) {
+          setTimeout(() => {
+            handleRankingTypeChange(currentRankingType);
+          }, 100);
+        }
       });
-    } else {
-      // 이미 맵이 있는 경우에도 데이터 렌더링
+    } else if (currentRankingType) {
+      // Only render data if a ranking type has been selected
       handleRankingTypeChange(currentRankingType);
     }
   } else if (tabId === 'tabTyphoon3' && !mapVideos) initMapVideos();

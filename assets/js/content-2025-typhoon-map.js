@@ -11,6 +11,10 @@
 mapboxgl.accessToken =
   'pk.eyJ1IjoiZGFmZ3QiLCJhIjoiY21pemt3MnByMHM2eTNkcHA0OHB6MzNtZSJ9.LVM0AlMbcmDDlrc5OVgFmg';
 
+// Active marker tracking
+let activeMarkerId = null;
+let activeVideoMarkerId = null;
+
 /**
  * Main map instance for the first tab.
  * @type {mapboxgl.Map}
@@ -801,6 +805,21 @@ function addCurrentTyphoonToMap(typhoon) {
       'text-halo-width': 1.5,
     },
   });
+
+  // Ensure current typhoon layers are above Korea layers
+  if (map.getLayer('south-korea-outline')) {
+    map.moveLayer('typhoon-route-current-past', 'south-korea-outline');
+    map.moveLayer('wind-area-15', 'south-korea-outline');
+    map.moveLayer('wind-area-25', 'south-korea-outline');
+    map.moveLayer('typhoon-points-current', 'south-korea-outline');
+    map.moveLayer('typhoon-points-current-labels', 'south-korea-outline');
+
+    // Move probability areas
+    const futurePoints = typhoon.path.filter((_, idx) => idx > typhoon.currentPosition);
+    futurePoints.forEach((_, idx) => {
+      map.moveLayer(`probability-area-${idx}`, 'south-korea-outline');
+    });
+  }
 }
 
 /**
@@ -863,8 +882,40 @@ function addTyphoonToMap(typhoon, index, isVisible) {
     },
   });
 
+  // Add active outline layer (initially hidden)
+  map.addLayer({
+    id: `typhoon-points-${index}-active`,
+    type: 'circle',
+    source: `typhoon-points-${index}`,
+    paint: {
+      'circle-radius': 8,
+      'circle-color': 'transparent',
+      'circle-stroke-width': 2,
+      'circle-stroke-color': '#58FFDE',
+      'circle-opacity': 0,
+      'circle-stroke-opacity': 0,
+    },
+  });
+
+  // Ensure markers are above Korea layers
+  if (map.getLayer('south-korea-outline')) {
+    map.moveLayer(`typhoon-route-${index}`, 'south-korea-outline');
+    map.moveLayer(`typhoon-points-${index}`, 'south-korea-outline');
+    map.moveLayer(`typhoon-points-${index}-active`, 'south-korea-outline');
+  }
+
   // Add click event for popup
   map.on('click', `typhoon-points-${index}`, (e) => {
+    const clickedMarkerId = `typhoon-points-${index}`;
+
+    // Remove active state from previous marker
+    if (activeMarkerId && activeMarkerId !== clickedMarkerId) {
+      map.setPaintProperty(`${activeMarkerId}-active`, 'circle-stroke-opacity', 0);
+    }
+
+    // Set active state for clicked marker
+    activeMarkerId = clickedMarkerId;
+    map.setPaintProperty(`${clickedMarkerId}-active`, 'circle-stroke-opacity', 0.9);
     const coordinates = e.features[0].geometry.coordinates.slice();
     const infoPanel = document.getElementById('typhoon-info-panel');
     if (!infoPanel) return;
@@ -1186,8 +1237,12 @@ function renderTop5Map(data) {
       layout: {
         'symbol-placement': 'line',
         'text-field': ['get', 'name'],
-        'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
-        'text-size': 14,
+        'text-font': [
+          'Spoqa Han Sans Neo',
+          'Open Sans Bold',
+          'Arial Unicode MS Bold',
+        ],
+        'text-size': 16,
         'text-radial-offset': 0,
         'text-rotation-alignment': 'map',
         'text-pitch-alignment': 'viewport',
@@ -1204,6 +1259,12 @@ function renderTop5Map(data) {
         'text-opacity': 0.9,
       },
     });
+
+    // Ensure layers are above Korea layers
+    if (mapTop5.getLayer('south-korea-outline')) {
+      mapTop5.moveLayer(`top5-route-${index}`, 'south-korea-outline');
+      mapTop5.moveLayer(`top5-label-${index}`, 'south-korea-outline');
+    }
 
     setTimeout(() => {
       const source = mapTop5.getSource(routeSourceId);
@@ -1274,12 +1335,18 @@ function renderVideoMarkers(type) {
   if (mapVideos.getLayer('video-markers')) {
     mapVideos.removeLayer('video-markers');
   }
+  if (mapVideos.getLayer('video-markers-active')) {
+    mapVideos.removeLayer('video-markers-active');
+  }
   if (mapVideos.getLayer('video-markers-labels')) {
     mapVideos.removeLayer('video-markers-labels');
   }
   if (mapVideos.getSource('video-markers')) {
     mapVideos.removeSource('video-markers');
   }
+
+  // Reset active marker state when switching video types
+  activeVideoMarkerId = null;
 
   // 필터링된 비디오 데이터
   const filteredVideos = videoData.filter((m) => m.type === type);
@@ -1324,6 +1391,22 @@ function renderVideoMarkers(type) {
     },
   });
 
+  // Active outline layer (initially hidden)
+  mapVideos.addLayer({
+    id: 'video-markers-active',
+    type: 'circle',
+    source: 'video-markers',
+    paint: {
+      'circle-radius': 24,
+      'circle-color': 'transparent',
+      'circle-stroke-width': 2,
+      'circle-stroke-color': '#58FFDE',
+      'circle-opacity': 0,
+      'circle-stroke-opacity': 0,
+    },
+    filter: ['==', 'number', -1], // Initially show no markers
+  });
+
   // 숫자 레이블 레이어 추가
   mapVideos.addLayer({
     id: 'video-markers-labels',
@@ -1331,8 +1414,13 @@ function renderVideoMarkers(type) {
     source: 'video-markers',
     layout: {
       'text-field': ['get', 'number'],
-      'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
-      'text-size': 18,
+      'text-font': [
+        'Spoqa Han Sans Neo',
+        'Lato',
+        'Open Sans Bold',
+        'Arial Unicode MS Bold',
+      ],
+      'text-size': 20,
       'text-anchor': 'center',
     },
     paint: {
@@ -1340,9 +1428,22 @@ function renderVideoMarkers(type) {
     },
   });
 
+  // Ensure markers are above Korea layers
+  if (mapVideos.getLayer('south-korea-outline')) {
+    mapVideos.moveLayer('video-markers', 'south-korea-outline');
+    mapVideos.moveLayer('video-markers-active', 'south-korea-outline');
+    mapVideos.moveLayer('video-markers-labels', 'south-korea-outline');
+  }
+
   // 클릭 이벤트 추가
   mapVideos.on('click', 'video-markers', (e) => {
     const properties = e.features[0].properties;
+    const clickedNumber = properties.number;
+
+    // Update active marker filter to show only the clicked marker
+    mapVideos.setFilter('video-markers-active', ['==', 'number', clickedNumber]);
+    mapVideos.setPaintProperty('video-markers-active', 'circle-stroke-opacity', 0.9);
+    activeVideoMarkerId = clickedNumber;
 
     // Create and dispatch a custom event
     const event = new CustomEvent('markerClick', {
@@ -1380,12 +1481,20 @@ function setupPopupCloseEvents() {
   const infoPanel = document.getElementById('typhoon-info-panel');
   if (!infoPanel) return;
 
+  // Helper function to close popup and remove active marker state
+  const closePopupAndResetActive = () => {
+    infoPanel.style.display = 'none';
+    // Remove active state from marker
+    if (activeMarkerId) {
+      map.setPaintProperty(`${activeMarkerId}-active`, 'circle-stroke-opacity', 0);
+      activeMarkerId = null;
+    }
+  };
+
   // X 버튼 클릭으로 닫기
   const closeBtn = infoPanel.querySelector('.panel-close-btn');
   if (closeBtn) {
-    closeBtn.addEventListener('click', () => {
-      infoPanel.style.display = 'none';
-    });
+    closeBtn.addEventListener('click', closePopupAndResetActive);
   }
 
   // 지도의 빈 공간(마커가 아닌 곳) 클릭 시 팝업 닫기
@@ -1397,7 +1506,7 @@ function setupPopupCloseEvents() {
     );
 
     if (!isMarkerClick && infoPanel.style.display === 'block') {
-      infoPanel.style.display = 'none';
+      closePopupAndResetActive();
     }
   });
 
@@ -1412,7 +1521,7 @@ function setupPopupCloseEvents() {
 
     // 팝업이 열려있고, 클릭한 곳이 팝업 내부가 아닌 경우
     if (infoPanel.style.display === 'block' && !infoPanel.contains(e.target)) {
-      infoPanel.style.display = 'none';
+      closePopupAndResetActive();
     }
   });
 }
