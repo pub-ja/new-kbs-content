@@ -82,8 +82,8 @@
                   style="display: none"
                 >
                   <button
-                    class="cnt-map-popup__btn-close"
-                    onclick="this.parentElement.style.display = 'none'"
+                    class="cnt-map-popup__btn-close panel-close-btn"
+                    aria-label="팝업 닫기"
                   ></button>
                   <div class="cnt-map-popup__content-wrapper">
                     <div class="cnt-map-popup__header">
@@ -96,7 +96,7 @@
                     </div>
                     <div class="cnt-map-popup__body">
                       <div class="cnt-map-popup__image">
-                        <img src="./assets/images/temp/img2.jpg" />
+                        <img src="./assets/images/temp/img-map-popup.gif" />
                       </div>
                       <div class="cnt-map-popup__info-table">
                         <div class="cnt-map-popup__date">
@@ -329,10 +329,7 @@
                       <span class="cnt-custom-select__arrow"> </span>
                     </div>
                     <div class="cnt-custom-select__options">
-                      <div
-                        class="cnt-custom-select__option"
-                        data-value="wind"
-                      >
+                      <div class="cnt-custom-select__option" data-value="wind">
                         <span class="cnt-custom-select__option-text"
                           >최대 순간 풍속</span
                         >
@@ -506,20 +503,32 @@
                             >
                               <div class="cnt-video-slide__thumbnail">
                                 <img
-                                  src="./assets/images/temp/img1.jpg"
+                                  src="./assets/images/temp/img-video-slider-thumb.jpg"
                                   alt="[강릉] 영동지역의 폭우"
-                                  onerror="
-                                    this.src =
-                                      'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22225%22%3E%3Crect fill=%22%23f0f0f0%22 width=%22400%22 height=%22225%22/%3E%3Ctext fill=%22%23999%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22%3E영상 썸네일%3C/text%3E%3C/svg%3E'
-                                  "
                                 />
                               </div>
-                              <div class="cnt-video-slide__info">
-                                <div class="cnt-video-slide__title">
-                                  <span class="video-slide-number">1</span>
-                                  <p>[강릉] 영동지역의 폭우</p>
+                              <div class="cnt-video-slide__content">
+                                <div class="cnt-video-slide__info">
+                                  <div class="cnt-video-slide__title-wrapper">
+                                    <span class="cnt-video-slide__number"
+                                      >1</span
+                                    >
+                                    <div class="cnt-video-slide__title">
+                                      [강릉] 영동지역의 폭우
+                                    </div>
+                                  </div>
+                                  <div class="cnt-video-slide__date">
+                                    2002.08.31
+                                  </div>
                                 </div>
-                                <p class="cnt-video-slide__date">2002.08.31</p>
+                                <div class="cnt-video-slide__icon">
+                                  <img
+                                    src="./assets/images/icon-new-blank.svg"
+                                    alt="외부 링크"
+                                    width="30"
+                                    height="30"
+                                  />
+                                </div>
                               </div>
                             </a>
                           </div>
@@ -538,54 +547,31 @@
                             >
                               <div class="cnt-video-slide__thumbnail">
                                 <img
-                                  src="./assets/images/video/thumb4.jpg"
+                                  src="./assets/images/temp/img-video-slider-thumb.jpg"
                                   alt="[서울] 침수 피해 현장"
-                                  onerror="
-                                    this.src =
-                                      'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22225%22%3E%3Crect fill=%22%23f0f0f0%22 width=%22400%22 height=%22225%22/%3E%3Ctext fill=%22%23999%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22%3E영상 썸네일%3C/text%3E%3C/svg%3E'
-                                  "
                                 />
-                                <div class="video-slide-number">4</div>
                               </div>
-                              <div class="cnt-video-slide__info">
-                                <div class="cnt-video-slide__title">
-                                  [서울] 침수 피해 현장
+                              <div class="cnt-video-slide__content">
+                                <div class="cnt-video-slide__info">
+                                  <div class="cnt-video-slide__title-wrapper">
+                                    <span class="cnt-video-slide__number"
+                                      >1</span
+                                    >
+                                    <div class="cnt-video-slide__title">
+                                      [서울] 침수 피해 현장
+                                    </div>
+                                  </div>
+                                  <div class="cnt-video-slide__date">
+                                    2012.08.28
+                                  </div>
                                 </div>
-                                <div class="cnt-video-slide__date">
-                                  2012.08.28
-                                </div>
-                              </div>
-                            </a>
-                          </div>
-                        </div>
-                        <div
-                          class="swiper-slide"
-                          data-type="damage"
-                          style="display: none"
-                        >
-                          <div class="cnt-video-slider__item">
-                            <a
-                              href="#"
-                              class="cnt-video-slide__link"
-                              target="_blank"
-                            >
-                              <div class="cnt-video-slide__thumbnail">
-                                <img
-                                  src="./assets/images/video/thumb4.jpg"
-                                  alt="[서울] 침수 피해 현장"
-                                  onerror="
-                                    this.src =
-                                      'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22225%22%3E%3Crect fill=%22%23f0f0f0%22 width=%22400%22 height=%22225%22/%3E%3Ctext fill=%22%23999%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22%3E영상 썸네일%3C/text%3E%3C/svg%3E'
-                                  "
-                                />
-                                <div class="video-slide-number">4</div>
-                              </div>
-                              <div class="cnt-video-slide__info">
-                                <div class="cnt-video-slide__title">
-                                  [서울] 침수 피해 현장
-                                </div>
-                                <div class="cnt-video-slide__date">
-                                  2012.08.28
+                                <div class="cnt-video-slide__icon">
+                                  <img
+                                    src="./assets/images/icon-new-blank.svg"
+                                    alt="외부 링크"
+                                    width="30"
+                                    height="30"
+                                  />
                                 </div>
                               </div>
                             </a>
@@ -593,8 +579,8 @@
                         </div>
                       </div>
                       <div class="cnt-swiper__pagination"></div>
-                      <div class="cnt-swiper__button-prev"></div>
-                      <div class="cnt-swiper__button-next"></div>
+                      <div class="cnt-swiper__button prev"></div>
+                      <div class="cnt-swiper__button next"></div>
                     </div>
                   </div>
                 </div>
@@ -605,8 +591,27 @@
       </div>
     </div>
 
-    <!-- 프로젝트 스크립트 (순서 중요!) -->
+    <!--
+      ============================================================
+      프로젝트 스크립트 (순서 매우 중요!)
+      ============================================================
+
+      1. data.js: Mock 데이터 전역 변수 선언
+      2. map.js: data.js의 변수를 사용하여 지도 초기화
+      3. ui.js: data.js와 map.js의 함수를 사용하여 UI 제어
+
+      [개발 전달 시]
+      - API 연동 후 data.js 스크립트 태그 제거
+      - map.js, ui.js는 유지 (데이터만 API로 교체)
+    -->
+
+    <!-- Mock 데이터 (API 연동 시 이 스크립트 태그 삭제) -->
+    <script src="./assets/js/content-2025-typhoon-data.js"></script>
+
+    <!-- 지도 로직 -->
     <script src="./assets/js/content-2025-typhoon-map.js"></script>
+
+    <!-- UI 로직 -->
     <script src="./assets/js/content-2025-typhoon-ui.js"></script>
   </body>
 </html>

@@ -670,7 +670,10 @@ select:focus {
 
 .cnt-panel-tab__button {
   flex: 1;
-  padding: 9px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 20px 9px;
   font-size: 16px;
   font-weight: 500;
   color: #555555;
@@ -698,38 +701,6 @@ select:focus {
 }
 
 /* ============================================
-   Video Markers
-   ============================================ */
-.video-marker {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  font-weight: 700;
-  color: #fff;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  border: none;
-  transition: all 0.3s ease;
-}
-
-.video-marker.approaching {
-  background-color: #ffa500;
-}
-
-.video-marker.damage {
-  background-color: #ff4444;
-}
-
-.video-marker:hover {
-  transform: scale(1.15);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-}
-
-/* ============================================
    Map Popup Panel (지도 팝업)
    ============================================ */
 .cnt-map-popup-panel {
@@ -741,7 +712,19 @@ select:focus {
   background-color: #25252b;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   z-index: 1000;
-  overflow: hidden;
+}
+
+.cnt-map-popup__content-wrapper::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  margin-left: -10px;
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 10px solid #25252b;
 }
 
 .cnt-map-popup__btn-close {
@@ -865,6 +848,13 @@ select:focus {
   color: #787878;
 }
 
+.cnt-main-tab__content.active
+  .cnt-map-overlay.collapsed
+  .cnt-map-overlay__content {
+  max-height: 0 !important;
+  margin-top: 0 !important;
+}
+
 /* ============================================
    Responsive - Tablet
    ============================================ */
@@ -913,6 +903,15 @@ select:focus {
 
   .cnt-map-section::after {
     height: 80px;
+  }
+
+  .cnt-map-popup__content-wrapper::after {
+    display: none;
+  }
+
+  .cnt-panel-tab__button {
+    font-size: 14px;
+    padding: 5px 12px 3px;
   }
 }
 /* ============================================
@@ -1210,7 +1209,9 @@ select:focus {
 .cnt-video-slide__thumbnail {
   position: relative;
   width: 100%;
+  height: 160px;
   background: #f0f0f0;
+  border: 1px solid #999;
   overflow: hidden;
 }
 
@@ -1220,20 +1221,39 @@ select:focus {
   object-fit: cover;
 }
 
-.video-slide-number {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  width: 30px;
-  height: 30px;
-  background: rgba(42, 82, 152, 0.9);
-  color: #fff;
-  border-radius: 50%;
+.cnt-video-slide__content {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
+}
+
+.cnt-video-slide__number {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  margin: 3px 4px 0 0;
+  background: #e96b06;
+  color: #fff;
+  border-radius: 50%;
   font-size: 14px;
+  text-align: center;
   font-weight: 600;
+}
+
+/* data-type에 따른 마커 컬러 매칭 */
+.swiper-slide[data-type='approaching'] .cnt-video-slide__number {
+  background: #e96b06;
+}
+
+.swiper-slide[data-type='damage'] .cnt-video-slide__number {
+  background: #dc1011;
+}
+
+.cnt-video-slide__title-wrapper {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 220px;
 }
 
 .cnt-video-slide__info {
@@ -1241,19 +1261,26 @@ select:focus {
 }
 
 .cnt-video-slide__title {
+  display: inline;
   font-size: 16px;
-  font-weight: 600;
   color: #333;
-  margin-bottom: 8px;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .cnt-video-slide__date {
-  font-size: 12px;
+  margin-top: 8px;
+  font-size: 14px;
   color: #999;
+}
+
+.cnt-video-slide__icon {
+  display: flex;
+  align-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 5px;
+  background: #f2f2f2;
 }
 
 /* Swiper 커스터마이징 */
@@ -1266,16 +1293,17 @@ select:focus {
   left: 0;
 }
 
-.cnt-swiper__button-prev,
-.cnt-swiper__button-next {
+.cnt-swiper__button {
   position: absolute;
+  z-index: 10;
   top: 50%;
-  margin-top: -25px;
+  transform: translateY(-50%);
+  cursor: pointer;
 }
 
 .cnt-video-slider .swiper-pagination-bullet {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   background-color: #2a5298;
   opacity: 0.4;
 }
@@ -1284,37 +1312,45 @@ select:focus {
   opacity: 1;
 }
 
-.cnt-swiper__button-prev,
-.cnt-swiper__button-next {
+.cnt-swiper__button {
   width: 40px;
   height: 40px;
-  background-color: rgba(255, 255, 255, 0.9);
-  border-radius: 50%;
   color: #2a5298;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-.cnt-swiper__button-prev:after,
-.cnt-swiper__button-next:after {
-  font-size: 20px;
-  font-weight: 700;
+.cnt-swiper__button.swiper-button-disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
 }
 
-.cnt-swiper__button-prev {
-  left: 10px;
+.cnt-swiper__button {
+  width: 32px;
+  height: 32px;
 }
 
-.cnt-swiper__button-next {
-  right: 10px;
+.cnt-swiper__button.prev {
+  left: -10px;
+  background: url(../images/btn-slider-prev.svg) no-repeat 50% 50%;
+}
+
+.cnt-swiper__button.next {
+  right: -10px;
+  background: url(../images/btn-slider-next.svg) no-repeat 50% 50%;
 }
 
 /* 모바일 슬라이더 조정 */
 @media (max-width: 900px) {
   .cnt-video-slider {
-    padding: 16px;
+    padding: 16px 10px;
   }
 
-  .cnt-video-slider__item {
+  .cnt-video-slide__title-wrapper {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    white-space: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .cnt-video-slide__link {
@@ -1322,27 +1358,34 @@ select:focus {
     flex: 1;
     flex-direction: row;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     padding: 20px 15px;
   }
 
-  .cnt-swiper__button-prev {
-    left: 0;
+  @media (hover: none) and (pointer: coarse) {
+    .cnt-video-slide__link:hover {
+      box-shadow: none;
+      transform: none;
+    }
   }
 
-  .cnt-swiper__button-next {
-    right: 0;
+  .cnt-video-slide__content {
+    width: 100%;
+  }
+
+  .cnt-video-slide__icon {
+    display: none;
   }
 
   .cnt-video-slide__thumbnail {
     flex-shrink: 0;
-    width: 120px;
-    height: 80px;
+    width: 110px;
+    height: 76px;
     padding-bottom: 0;
   }
 
   .cnt-video-slide__title {
-    font-size: 14px;
+    font-size: 15px;
   }
 
   .cnt-video-slide__info {
@@ -1434,14 +1477,13 @@ select:focus {
 
 .cnt-map-overlay__content {
   position: absolute;
-  max-height: 0;
-  overflow: hidden;
+  max-height: 500px;
   min-width: 400px;
   transform: translateX(-50%);
   transition:
     max-height 0.3s ease,
     margin-top 0.3s ease;
-  margin-top: 0;
+  margin-top: 12px;
   margin-left: 20px;
   background: rgba(50, 50, 50, 0.8);
   backdrop-filter: blur(10px);
@@ -1449,16 +1491,40 @@ select:focus {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
+.cnt-map-overlay.collapsed .cnt-map-overlay__content {
+  max-height: 0;
+  margin-top: 0;
+  overflow: hidden;
+}
+
+.cnt-map-overlay__content::after {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  margin-left: -10px;
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-bottom: 10px solid rgba(50, 50, 50, 0.8);
+}
+
+/* 모바일에서 팝업 꼬리 중앙 정렬 */
+@media (max-width: 900px) {
+  .cnt-map-overlay__content::after {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .cnt-map-overlay__content::after {
+    display: none;
+  }
+}
+
 .cnt-main-tab__content.active .cnt-map-overlay .cnt-map-overlay__content {
   max-height: 500px;
   margin-top: 12px;
-}
-
-.cnt-main-tab__content.active
-  .cnt-map-overlay.collapsed
-  .cnt-map-overlay__content {
-  max-height: 0 !important;
-  margin-top: 0 !important;
 }
 
 .cnt-map-overlay__text {
@@ -1481,7 +1547,7 @@ select:focus {
   }
 
   .cnt-map-overlay {
-    max-width: calc(100% - 20px - 10px - 120px);
+    max-width: calc(100% - 150px);
   }
 
   .cnt-map-overlay__toggle,

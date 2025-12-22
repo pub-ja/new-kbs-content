@@ -1,6 +1,35 @@
 /**
  * @file UI component logic for the typhoon visualization page.
  * This includes tab navigation, custom selects, sliders, and other interactive elements.
+ *
+ * ============================================================
+ * [개발 전달 가이드]
+ * ============================================================
+ *
+ * 1. 파일 구조:
+ *    - content-2025-typhoon-data.js: Mock 데이터 (API 연동 시 삭제)
+ *    - content-2025-typhoon-map.js: 지도 로직
+ *    - content-2025-typhoon-ui.js: UI 및 사용자 인터랙션 (현재 파일)
+ *
+ * 2. API 연동 시 수정 필요 부분:
+ *    - renderTop5List(): Top5 리스트 렌더링
+ *    - renderVideoSlider(): 비디오 슬라이더 렌더링
+ *    - setupTyphoonSelect(): 태풍 선택 드롭다운
+ *    - handleRankingTypeChange(): Top5 타입 변경
+ *
+ * 3. Mock 데이터 위치:
+ *    - content-2025-typhoon-data.js 파일
+ *    - 변수: currentTyphoon, typhoons, videoData, top5DamageData, top5CasualtiesData
+ *
+ * 4. 주요 데이터 구조:
+ *    - Top5: { rank, year, name, wind/damage/casualties, color }
+ *    - Video: { coord, number, type, title, date, thumbnail, url }
+ *
+ * 5. 유지해야 할 기능:
+ *    - Swiper.js 초기화 및 제어
+ *    - 모바일 바텀시트 드래그/토글
+ *    - 탭 전환 및 스티키 네비게이션
+ *    - 지도 마커 클릭 ↔ 슬라이더 동기화
  */
 
 // ============================================================
@@ -259,14 +288,14 @@ function renderCurrentTyphoon(typhoon) {
   if (!typhoon) {
     // No typhoon: remove active class and update content
     if (typhoonItem) typhoonItem.classList.remove('active');
-    if (iconEl) iconEl.textContent = '태풍 없음';
-    if (textEl) textEl.textContent = '현재 진행중인 태풍이 없습니다.';
+    if (iconEl) iconEl.textContent = '';
+    if (textEl) textEl.textContent = '발생 태풍 없음';
     return;
   }
 
   // Active typhoon: add active class and update content
   if (typhoonItem) typhoonItem.classList.add('active');
-  if (iconEl) iconEl.textContent = '태풍 진행중';
+  if (iconEl) iconEl.textContent = '진행 중';
   if (textEl)
     textEl.textContent = `2025년 제 ${typhoon.number}호 ${typhoon.name}`;
 }
@@ -286,6 +315,16 @@ function setupTyphoonSelect() {
     const infoPanel = document.getElementById('typhoon-info-panel');
     if (infoPanel) {
       infoPanel.style.display = 'none';
+    }
+
+    // Reset active marker state when changing selection
+    if (
+      typeof activeMarkerId !== 'undefined' &&
+      activeMarkerId &&
+      map.getLayer(`${activeMarkerId}-active`)
+    ) {
+      map.setFilter(`${activeMarkerId}-active`, ['==', 'pointIndex', -1]);
+      activeMarkerId = null;
     }
 
     // Display info for the selected typhoon
@@ -311,18 +350,6 @@ function setupTyphoonSelect() {
       currentTyphoon.path.forEach((p) => bounds.extend(p.coord));
     }
 
-    // 모바일과 PC에서 다른 padding 적용
-    const isMobile = window.innerWidth <= 900;
-    const padding = isMobile
-      ? { top: 50, bottom: 50, left: 50, right: 50 }
-      : { top: 80, bottom: 80, left: 80, right: 400 };
-
-    map.fitBounds(bounds, {
-      padding: padding,
-      duration: 1500,
-      maxZoom: 8,
-    });
-
     // Hide all other historical paths and disable click events
     typhoons.forEach((_, i) => {
       if (map.getLayer(`typhoon-route-${i}`)) {
@@ -344,6 +371,50 @@ function setupTyphoonSelect() {
     if (currentTyphoon) {
       setMarkerOpacity('typhoon-points-current', 0.6);
     }
+
+    // 모바일과 PC에서 다른 padding 적용
+    const isMobile = window.innerWidth <= 900;
+
+    // 모바일에서는 바텀시트 높이를 고려하여 padding 계산
+    let bottomPadding = 50;
+    if (isMobile && infoContainer) {
+      // infoContainer가 active 상태가 되면 높이를 측정
+      // DOM 업데이트 후 높이를 측정하기 위해 다음 프레임에서 실행
+      setTimeout(() => {
+        const containerHeight = infoContainer.offsetHeight;
+        bottomPadding = containerHeight + 20; // 여유 공간 20px 추가
+
+        map.fitBounds(bounds, {
+          padding: { top: 50, bottom: bottomPadding, left: 50, right: 50 },
+          duration: 1500,
+          maxZoom: 8,
+        });
+
+        // Animate the selected typhoon's path after the map moves
+        setTimeout(() => {
+          animateTyphoonRoute(parseInt(selectedIndex));
+          // Enable click events only for the selected typhoon
+          const selectedLayer = map.getLayer(`typhoon-points-${selectedIndex}`);
+          if (selectedLayer) {
+            map.setLayoutProperty(
+              `typhoon-points-${selectedIndex}`,
+              'visibility',
+              'visible'
+            );
+          }
+        }, 1500);
+      }, 100);
+      return; // 모바일에서는 여기서 종료
+    }
+
+    // PC에서의 처리
+    const padding = { top: 80, bottom: 80, left: 80, right: 400 };
+
+    map.fitBounds(bounds, {
+      padding: padding,
+      duration: 1500,
+      maxZoom: 8,
+    });
 
     // Animate the selected typhoon's path after the map moves
     setTimeout(() => {
@@ -409,12 +480,31 @@ function handleRankingTypeChange(type) {
 
 /**
  * Renders the list of top 5 typhoons in the info panel.
+ *
+ * [API 연동 가이드]
+ * - 현재: Mock 데이터(typhoons 배열)를 정렬하여 렌더링
+ * - 개발 시: API 응답 데이터로 교체
+ *
+ * API 응답 예상 형식:
+ * [
+ *   {
+ *     rank: 1,              // 순위
+ *     year: 2002,           // 년도
+ *     name: "루사",         // 태풍명
+ *     wind: 56.0,           // 최대풍속 (m/s)
+ *     damage: 51000,        // 재산피해 (억원)
+ *     casualties: 246       // 인명피해 (명)
+ *   },
+ *   ...
+ * ]
+ *
  * @param {Array<Object>} data The sorted and sliced array of top 5 typhoons.
  */
 function renderTop5List(data) {
   const listContainer = document.getElementById('topTyphoonList');
   if (!listContainer) return;
 
+  // [MOCK DATA - API 연동 시 이 함수 전체를 API 호출로 교체]
   listContainer.innerHTML = ''; // Clear the list before rendering
 
   data.forEach((typhoon) => {
@@ -432,6 +522,7 @@ function renderTop5List(data) {
       unit = '명';
     }
 
+    // [개발 참고] 아래 HTML 구조를 React 컴포넌트 또는 템플릿 엔진으로 변환
     const listItemHTML = `
       <li class="cnt-top5-list__item">
         <div class="cnt-top5-list__info">
@@ -474,6 +565,67 @@ function initializeVideoTabButtons() {
 
 /**
  * Renders the Swiper.js slider for typhoon videos.
+ *
+ * ============================================================
+ * [Mapbox Studio / API 연동 가이드]
+ * ============================================================
+ *
+ * 📌 필수 필드 (Required Fields)
+ * - type: string - "approaching" | "damage" (정확한 값 필수, 대소문자 구분)
+ * - number: number - 각 타입별로 1부터 시작하는 순번 (마커-슬라이더 연동에 사용)
+ * - title: string - 영상 제목
+ * - date: string - 날짜 (형식: "YYYY.MM.DD")
+ * - url: string - 영상 링크 URL
+ * - coord: [number, number] - 지도 좌표 [경도, 위도] (마커 표시 위치)
+ *
+ * 📌 선택 필드 (Optional Fields)
+ * - thumbnail: string - 썸네일 이미지 URL (없으면 기본 이미지 사용)
+ *
+ * ============================================================
+ * [중요] 데이터 매핑 규칙
+ * ============================================================
+ *
+ * 1. type 값 매핑:
+ *    - "approaching" → 접근 기록 탭 / 마커 색상: #E96B06
+ *    - "damage" → 피해 기록 탭 / 마커 색상: #DC1011
+ *    - CSS: .swiper-slide[data-type="..."] .cnt-video-slide__number
+ *
+ * 2. number 매핑 (중요!):
+ *    - 각 type별로 1부터 시작 (approaching: 1,2,3 / damage: 1,2,3)
+ *    - 마커 클릭 시 slideIndex 계산에 사용: properties.number - 1
+ *    - 연속된 번호여야 슬라이더와 정확히 매칭됨
+ *
+ * 3. coord 매핑:
+ *    - GeoJSON 형식: [경도(lng), 위도(lat)]
+ *    - 예: [129.0, 35.1]
+ *
+ * ============================================================
+ * API 응답 예시:
+ * ============================================================
+ * [
+ *   {
+ *     coord: [129.0, 35.1],
+ *     number: 1,
+ *     type: "approaching",
+ *     title: "[강릉] 영동지역의 폭우",
+ *     date: "2002.08.31",
+ *     thumbnail: "./assets/images/video/thumb1.jpg",
+ *     url: "https://..."
+ *   },
+ *   {
+ *     coord: [126.5, 33.5],
+ *     number: 2,
+ *     type: "approaching",
+ *     ...
+ *   },
+ *   {
+ *     coord: [127.0, 37.5],
+ *     number: 1,
+ *     type: "damage",
+ *     ...
+ *   }
+ * ]
+ *
  * @param {'approaching' | 'damage'} type The type of videos to display.
  */
 function renderVideoSlider(type) {
@@ -482,30 +634,39 @@ function renderVideoSlider(type) {
   );
   if (!sliderWrapper) return;
 
+  // [MOCK DATA - API 연동 시 videoData를 API 응답으로 교체]
   const filteredVideos = videoData.filter((video) => video.type === type);
 
-  // Create slides from videoData
+  // 슬라이드 동적 생성
   sliderWrapper.innerHTML = filteredVideos
     .map(
-      (video, index) => `
+      (video) => `
         <div class="swiper-slide" data-type="${video.type}">
-            <div class="cnt-video-slider__item">
-                <a href="${video.url}" class="cnt-video-slide__link" target="_blank">
-                    <div class="cnt-video-slide__thumbnail">
-                        <img src="${video.thumbnail}" alt="${video.title}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22225%22%3E%3Crect fill=%22%23f0f0f0%22 width=%22400%22 height=%22225%22/%3E%3Ctext fill=%22%23999%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22%3E영상 썸네일%3C/text%3E%3C/svg%3E'">
-                        <div class="video-slide-number">${index + 1}</div>
-                    </div>
-                    <div class="cnt-video-slide__info">
-                        <div class="cnt-video-slide__title">${video.title}</div>
-                        <div class="cnt-video-slide__date">${video.date}</div>
-                    </div>
-                </a>
-            </div>
+          <div class="cnt-video-slider__item">
+            <a href="${video.url}" class="cnt-video-slide__link" target="_blank">
+              <div class="cnt-video-slide__thumbnail">
+                <img src="${video.thumbnail || './assets/images/temp/img-video-slider-thumb.jpg'}" alt="${video.title}" onerror="this.src='./assets/images/temp/img-video-slider-thumb.jpg'">
+              </div>
+              <div class="cnt-video-slide__content">
+                <div class="cnt-video-slide__info">
+                  <div class="cnt-video-slide__title-wrapper">
+                    <span class="cnt-video-slide__number">${video.number}</span>
+                    <div class="cnt-video-slide__title">${video.title}</div>
+                  </div>
+                  <div class="cnt-video-slide__date">${video.date}</div>
+                </div>
+                <div class="cnt-video-slide__icon">
+                  <img src="./assets/images/icon-new-blank.svg" alt="외부 링크" width="30" height="30">
+                </div>
+              </div>
+            </a>
+          </div>
         </div>
     `
     )
     .join('');
 
+  // Swiper 재초기화
   if (videoSwiper) {
     videoSwiper.destroy(true, true);
   }
@@ -514,8 +675,8 @@ function renderVideoSlider(type) {
     slidesPerView: 1,
     spaceBetween: 20,
     navigation: {
-      nextEl: '.cnt-swiper__button-next',
-      prevEl: '.cnt-swiper__button-prev',
+      nextEl: '.cnt-swiper__button next',
+      prevEl: '.cnt-swiper__button prev',
     },
     pagination: {
       el: '.cnt-swiper__pagination',
@@ -614,7 +775,9 @@ function switchTab(tabId) {
   // Initialize map if it doesn't exist yet
   if (tabId === 'tabTyphoon2') {
     // Remove active class if no selection (CSS 클래스로 통일)
-    const resultPanel = document.querySelector('#tabTyphoon2 .cnt-panel-result');
+    const resultPanel = document.querySelector(
+      '#tabTyphoon2 .cnt-panel-result'
+    );
     if (resultPanel && !currentRankingType) {
       resultPanel.classList.remove('active');
     }
@@ -645,6 +808,28 @@ function switchTab(tabId) {
 
 /**
  * Sets up a generic custom select dropdown.
+ *
+ * [개발 권장사항]
+ * - 드롭다운 옵션은 HTML에서 직접 관리하는 것을 권장
+ * - 현재 구조: HTML에 .cnt-custom-select__option 요소를 미리 작성
+ * - data-value 속성으로 값 전달, .cnt-custom-select__option-text로 텍스트 표시
+ *
+ * HTML 구조 예시:
+ * <div id="custom-select" class="cnt-custom-select">
+ *   <div class="cnt-custom-select__trigger">
+ *     <span class="cnt-custom-select__text">선택하세요</span>
+ *   </div>
+ *   <ul class="cnt-custom-select__options">
+ *     <li class="cnt-custom-select__option" data-value="0">
+ *       <span class="cnt-custom-select__option-text">옵션 1</span>
+ *     </li>
+ *   </ul>
+ * </div>
+ *
+ * [API 연동 시]
+ * - 옵션을 동적으로 생성해야 한다면 innerHTML로 옵션 리스트 생성
+ * - 또는 React의 경우 컴포넌트로 변환하여 map() 사용
+ *
  * @param {string} selectId The ID of the select element.
  * @param {Function} onSelectCallback A callback function executed on selection.
  */

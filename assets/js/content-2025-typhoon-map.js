@@ -1,13 +1,39 @@
 /**
  * @file Mapbox-related logic for the typhoon visualization page.
- * This includes map initialization, data loading, and functions to draw typhoon paths.
+ * This includes map initialization and functions to draw typhoon paths.
+ *
+ * ============================================================
+ * [개발 전달 가이드]
+ * ============================================================
+ *
+ * 1. 파일 구조:
+ *    - content-2025-typhoon-data.js: Mock 데이터 (API 연동 시 삭제)
+ *    - content-2025-typhoon-map.js: 지도 로직 (현재 파일)
+ *    - content-2025-typhoon-ui.js: UI 및 사용자 인터랙션
+ *
+ * 2. Mapbox 의존성:
+ *    - mapboxgl 라이브러리 필수
+ *    - Access Token 교체 필요 (아래 참조)
+ *
+ * 3. 외부 GeoJSON 의존성:
+ *    - Natural Earth 육지 데이터
+ *    - 한국 행정구역 데이터
+ *    - 네트워크 오류 시 대체 방안 필요
+ *
+ * 4. 주요 함수:
+ *    - initializeMap(): 메인 맵 초기화
+ *    - initMapTop5(): Top5 맵 초기화
+ *    - initMapVideos(): 비디오 맵 초기화
+ *    - addTyphoonToMap(): 태풍 경로 추가
+ *    - renderTop5Map(): Top5 태풍 렌더링
+ *    - renderVideoMarkers(): 영상 마커 렌더링
  */
 
 // ============================================================
 // MAPBOX INITIALIZATION & CONFIG
 // ============================================================
 
-// Mapbox Access Token
+// [TODO] Mapbox Access Token - 실제 프로덕션 토큰으로 교체 필요
 mapboxgl.accessToken =
   'pk.eyJ1IjoiZGFmZ3QiLCJhIjoiY21pemt3MnByMHM2eTNkcHA0OHB6MzNtZSJ9.LVM0AlMbcmDDlrc5OVgFmg';
 
@@ -54,6 +80,60 @@ function updateMapZoomResponsively(mapInstance, desktopZoom, mobileZoom) {
 // 모바일에서는 줌 레벨을 낮춰서 더 넓게 보이도록 설정
 const initialZoom = getResponsiveZoom(6, 5);
 
+/**
+ * ============================================================
+ * [Mapbox Studio 연동 가이드] 현재 태풍 레이어
+ * ============================================================
+ *
+ * 📌 현재 방식: JavaScript에서 직접 스타일 정의
+ * - style: { version: 8, sources: {}, layers: [...] }
+ * - 장점: 모든 것을 코드로 제어 가능
+ * - 단점: 스타일 수정 시 코드 수정 필요
+ *
+ * 📌 Studio 연동 방식 (권장):
+ * 1. Mapbox Studio에서 현재 태풍 레이어 생성 및 스타일링
+ * 2. 스타일 URL 복사: mapbox://styles/YOUR_USERNAME/YOUR_STYLE_ID
+ * 3. 아래 style 속성을 Studio URL로 변경:
+ *
+ * const map = new mapboxgl.Map({
+ *   container: 'map',
+ *   style: 'mapbox://styles/YOUR_USERNAME/YOUR_STYLE_ID',  // ← Studio 스타일 URL
+ *   center: [128.0, 36.0],
+ *   zoom: initialZoom,
+ *   pitch: 0,
+ * });
+ *
+ * 📌 Studio 레이어 + JavaScript 역대 태풍 레이어 조합:
+ * - Studio: 현재 태풍 레이어 (항상 표시)
+ * - JavaScript: 역대 태풍 레이어 (선택 시 표시)
+ *
+ * map.on('load', () => {
+ *   // Studio 레이어는 자동으로 로드됨
+ *
+ *   // 역대 태풍만 JavaScript로 추가
+ *   typhoons.forEach((typhoon, index) => {
+ *     addTyphoonToMap(typhoon, index, false);
+ *   });
+ *
+ *   // 레이어 순서 조정 (선택사항)
+ *   // Studio의 현재 태풍 레이어 이름이 'current-typhoon-layer'라고 가정
+ *   typhoons.forEach((_, index) => {
+ *     // 역대 태풍을 현재 태풍 아래에 배치하려면:
+ *     map.moveLayer(`typhoon-route-${index}`, 'current-typhoon-layer');
+ *     map.moveLayer(`typhoon-points-${index}`, 'current-typhoon-layer');
+ *   });
+ * });
+ *
+ * 📌 Studio 레이어 제어 (JavaScript에서):
+ * - 숨기기: map.setPaintProperty('current-typhoon-layer', 'line-opacity', 0);
+ * - 보이기: map.setPaintProperty('current-typhoon-layer', 'line-opacity', 1);
+ * - 클릭: map.on('click', 'current-typhoon-layer', (e) => { ... });
+ * - 모든 기능 동일하게 작동 (zoom, fitBounds, 애니메이션 등)
+ *
+ * 📌 필수 Studio 레이어 이름 규칙:
+ * - renderCurrentTyphoon() 함수에서 사용하는 레이어 ID와 일치 필요
+ * - 예: 'current-typhoon-route', 'current-typhoon-points' 등
+ */
 const map = new mapboxgl.Map({
   container: 'map',
   style: {
@@ -88,342 +168,10 @@ let mapTop5 = null;
 let mapVideos = null;
 
 // ============================================================
-// TYPHOON DATA
+// DATA IMPORT
 // ============================================================
-
-/**
- * 태풍 색상 상수
- */
-const TYPHOON_COLORS = {
-  SARAH: '#ffa07a', // 사라 - 주황
-  PRAPIROON: '#4ecdc4', // 뿌라삐롱 - 청록
-  RUSA: '#ff6b6b', // 루사 - 빨강
-  MAEMI: '#74b9ff', // 매미 - 파랑
-  NARI: '#ff9cee', // 나리 - 분홍
-  BOLAVEN: '#95e1d3', // 볼라벤&덴빈 - 민트
-  CHABA: '#ffd93d', // 차바 - 노랑
-};
-
-/**
- * Data for the currently active typhoon.
- * Set to null if there is no active typhoon.
- */
-const currentTyphoon = {
-  name: '제비(JEBI)',
-  number: '18',
-  year: 2025,
-  path: [
-    {
-      coord: [126.5, 29.0],
-      time: '20일(화) 06시',
-      wind: 18,
-      windRadius15: 250,
-      windRadius25: 150,
-      isPast: true,
-    },
-    {
-      coord: [127.0, 30.5],
-      time: '20일(화) 12시',
-      wind: 20,
-      windRadius15: 270,
-      windRadius25: 170,
-      isPast: true,
-    },
-    {
-      coord: [127.5, 32.0],
-      time: '20일(화) 18시',
-      wind: 22,
-      windRadius15: 280,
-      windRadius25: 180,
-      isPast: false,
-      isCurrent: true,
-    },
-    {
-      coord: [128.0, 33.5],
-      time: '21일(수) 00시',
-      wind: 24,
-      windRadius15: 300,
-      windRadius25: 200,
-      isPast: false,
-    },
-    {
-      coord: [128.5, 35.0],
-      time: '21일(수) 06시',
-      wind: 26,
-      windRadius15: 320,
-      windRadius25: 220,
-      isPast: false,
-    },
-    {
-      coord: [129.0, 36.5],
-      time: '21일(수) 18시',
-      wind: 28,
-      windRadius15: 350,
-      windRadius25: 240,
-      isPast: false,
-    },
-  ],
-  currentPosition: 2, // 현재 위치 인덱스
-  damage: 0, // 진행중이라 미정
-  rain: 0,
-  wind: 22,
-  casualties: 0,
-  pressure: 965,
-  windRadius: 280, // 15m/s 강풍 반경
-  windRadius25: 180, // 25m/s 강풍 반경
-  color: 'red',
-  category: '강',
-  isCurrent: true,
-};
-// const currentTyphoon = null; // 현재 태풍 없을 시
-
-/**
- * Historical typhoon data.
- * HTML 셀렉트 박스 순서와 동일하게 정렬
- * @type {Array<Object>}
- */
-const typhoons = [
-  {
-    name: '사라',
-    nameEn: 'SARAH',
-    number: '14',
-    year: 1959,
-    path: [
-      [123.0, 27.0],
-      [124.5, 29.5],
-      [126.0, 31.0],
-      [127.0, 33.5],
-      [128.5, 36.0],
-      [130.0, 38.0],
-      [131.0, 40.0],
-      [132.0, 42.0],
-      [133.0, 44.0],
-      [134.0, 46.0],
-    ],
-    damage: 850,
-    rain: 385.0,
-    wind: 85,
-    casualties: 849,
-    pressure: 950,
-    windRadius: 300,
-    color: TYPHOON_COLORS.SARAH,
-    category: '초강력',
-    description:
-      '1959년 태풍 사라는 관측 이래 최대 규모의 태풍으로, 최저기압 최저기압(950hpa)과 초속 85m/sec의 강풍 및 폭우로 평상복도에 막대한 피해를 입혔습니다.',
-  },
-  {
-    name: '뿌라삐롱',
-    nameEn: 'PRAPIROON',
-    number: '12',
-    year: 2000,
-    path: [
-      [122.5, 26.0],
-      [124.0, 28.5],
-      [125.5, 30.5],
-      [127.0, 32.5],
-      [128.5, 34.5],
-      [129.5, 36.5],
-      [130.0, 38.5],
-      [130.5, 40.5],
-      [131.0, 42.5],
-      [131.5, 44.5],
-    ],
-    damage: 387,
-    rain: 658.5,
-    wind: 44,
-    casualties: 12,
-    pressure: 970,
-    windRadius: 260,
-    color: TYPHOON_COLORS.PRAPIROON,
-    category: '매우강',
-  },
-  {
-    name: '루사',
-    nameEn: 'RUSA',
-    number: '15',
-    year: 2002,
-    path: [
-      [123.0, 26.0],
-      [124.5, 28.5],
-      [126.0, 31.0],
-      [127.5, 33.0],
-      [129.0, 35.5],
-      [130.5, 37.5],
-      [131.5, 39.5],
-      [132.0, 41.0],
-      [132.5, 43.0],
-      [133.0, 45.0],
-    ],
-    damage: 51000,
-    rain: 870.5,
-    wind: 56,
-    casualties: 246,
-    pressure: 950,
-    windRadius: 330,
-    color: TYPHOON_COLORS.RUSA,
-    category: '초강력',
-    description:
-      '이 태풍은 3,382명의 인명피해와 2,490억 원의 재산피해(2003년 기준)를 가져왔으며, 당시 가장 오랜 인류 피해 규모가 더욱 커졌던 대표적인 재난으로 남아있습니다.',
-  },
-  {
-    name: '매미',
-    nameEn: 'MAEMI',
-    number: '14',
-    year: 2003,
-    path: [
-      [122.0, 27.0],
-      [123.5, 29.0],
-      [125.0, 32.0],
-      [126.5, 33.5],
-      [128.0, 35.0],
-      [129.5, 36.5],
-      [130.0, 38.0],
-      [130.5, 40.0],
-      [131.0, 42.0],
-      [131.5, 44.0],
-    ],
-    damage: 51470,
-    rain: 455.5,
-    wind: 60,
-    casualties: 131,
-    pressure: 910,
-    windRadius: 350,
-    color: TYPHOON_COLORS.MAEMI,
-    category: '초강력',
-  },
-  {
-    name: '나리',
-    nameEn: 'NARI',
-    number: '11',
-    year: 2007,
-    path: [
-      [125.0, 26.0],
-      [126.5, 28.5],
-      [128.0, 31.0],
-      [129.0, 33.0],
-      [129.5, 35.5],
-      [129.0, 37.5],
-      [128.5, 39.0],
-      [128.0, 40.5],
-      [127.5, 42.5],
-      [127.0, 44.5],
-    ],
-    damage: 423,
-    rain: 732.5,
-    wind: 45,
-    casualties: 18,
-    pressure: 960,
-    windRadius: 280,
-    color: TYPHOON_COLORS.NARI,
-    category: '매우강',
-  },
-  {
-    name: '볼라벤&덴빈',
-    nameEn: 'BOLAVEN&TEMBIN',
-    number: '14&15',
-    year: 2012,
-    path: [
-      [122.0, 25.5],
-      [123.5, 28.0],
-      [125.0, 30.0],
-      [126.5, 32.5],
-      [128.0, 35.0],
-      [129.0, 37.0],
-      [129.5, 39.0],
-      [130.0, 41.0],
-      [130.5, 43.0],
-      [131.0, 45.0],
-    ],
-    damage: 1055,
-    rain: 248.0,
-    wind: 43,
-    casualties: 8,
-    pressure: 965,
-    windRadius: 270,
-    color: TYPHOON_COLORS.BOLAVEN,
-    category: '강',
-  },
-  {
-    name: '차바',
-    nameEn: 'CHABA',
-    number: '18',
-    year: 2016,
-    path: [
-      [124.0, 25.0],
-      [125.5, 27.5],
-      [127.0, 30.0],
-      [128.0, 32.5],
-      [129.0, 35.0],
-      [129.5, 37.0],
-      [130.0, 39.0],
-      [130.5, 41.0],
-      [131.0, 43.0],
-      [131.5, 45.0],
-    ],
-    damage: 2673,
-    rain: 304.0,
-    wind: 52,
-    casualties: 7,
-    pressure: 905,
-    windRadius: 320,
-    color: TYPHOON_COLORS.CHABA,
-    category: '초강력',
-  },
-];
-
-/** Data for Top 5 tab */
-// 순위별 색상: 1위 F65570, 2위 DA9EFF, 3위 E2B35D, 4위 52D03E, 5위 87E5FF
-const top5Colors = ['#F65570', '#DA9EFF', '#E2B35D', '#52D03E', '#87E5FF'];
-
-const top5DamageData = [...typhoons]
-  .sort((a, b) => b.damage - a.damage)
-  .slice(0, 5)
-  .map((t, i) => ({ ...t, rank: i + 1 }));
-
-const top5CasualtiesData = [...typhoons]
-  .sort((a, b) => b.casualties - a.casualties)
-  .slice(0, 5)
-  .map((t, i) => ({ ...t, rank: i + 1 }));
-
-/** Data for video markers tab */
-const videoData = [
-  {
-    coord: [129.0, 35.1],
-    number: 1,
-    type: 'approaching',
-    title: '[강릉] 영동지역의 폭우',
-    date: '2002.08.31',
-    thumbnail: './assets/images/video/thumb1.jpg',
-    url: '#',
-  },
-  {
-    coord: [126.5, 33.5],
-    number: 2,
-    type: 'approaching',
-    title: '[제주] 태풍 차바 접근',
-    date: '2016.10.05',
-    thumbnail: './assets/images/video/thumb2.jpg',
-    url: '#',
-  },
-  {
-    coord: [128.6, 35.9],
-    number: 3,
-    type: 'approaching',
-    title: '[부산] 태풍 매미 상륙',
-    date: '2003.09.12',
-    thumbnail: './assets/images/video/thumb3.jpg',
-    url: '#',
-  },
-  {
-    coord: [127.0, 37.5],
-    number: 4,
-    type: 'damage',
-    title: '[서울] 침수 피해 현장',
-    date: '2012.08.28',
-    thumbnail: './assets/images/video/thumb4.jpg',
-    url: '#',
-  },
-];
+// Mock 데이터는 content-2025-typhoon-data.js에서 불러옴
+// API 연동 시 해당 파일 삭제하고 API 호출로 대체
 
 // ============================================================
 // MAP LOADING & INITIALIZATION
@@ -806,20 +554,19 @@ function addCurrentTyphoonToMap(typhoon) {
     },
   });
 
-  // Ensure current typhoon layers are above Korea layers
-  if (map.getLayer('south-korea-outline')) {
-    map.moveLayer('typhoon-route-current-past', 'south-korea-outline');
-    map.moveLayer('wind-area-15', 'south-korea-outline');
-    map.moveLayer('wind-area-25', 'south-korea-outline');
-    map.moveLayer('typhoon-points-current', 'south-korea-outline');
-    map.moveLayer('typhoon-points-current-labels', 'south-korea-outline');
+  // Ensure current typhoon layers are above all other layers (맨 위로 이동)
+  map.moveLayer('typhoon-route-current-past');
+  map.moveLayer('wind-area-15');
+  map.moveLayer('wind-area-25');
+  map.moveLayer('typhoon-points-current');
+  map.moveLayer('typhoon-points-current-labels');
 
-    // Move probability areas
-    const futurePoints = typhoon.path.filter((_, idx) => idx > typhoon.currentPosition);
-    futurePoints.forEach((_, idx) => {
-      map.moveLayer(`probability-area-${idx}`, 'south-korea-outline');
+  // Move probability areas to top
+  typhoon.path
+    .filter((_, idx) => idx > typhoon.currentPosition)
+    .forEach((_, idx) => {
+      map.moveLayer(`probability-area-${idx}`);
     });
-  }
 }
 
 /**
@@ -882,40 +629,44 @@ function addTyphoonToMap(typhoon, index, isVisible) {
     },
   });
 
-  // Add active outline layer (initially hidden)
+  // Add active outline layer (initially hidden, filtered by pointIndex)
   map.addLayer({
     id: `typhoon-points-${index}-active`,
     type: 'circle',
     source: `typhoon-points-${index}`,
+    filter: ['==', 'pointIndex', -1], // Initially show none (no point has index -1)
     paint: {
       'circle-radius': 8,
       'circle-color': 'transparent',
       'circle-stroke-width': 2,
       'circle-stroke-color': '#58FFDE',
-      'circle-opacity': 0,
-      'circle-stroke-opacity': 0,
+      'circle-opacity': 1,
+      'circle-stroke-opacity': 0.9,
     },
   });
 
-  // Ensure markers are above Korea layers
-  if (map.getLayer('south-korea-outline')) {
-    map.moveLayer(`typhoon-route-${index}`, 'south-korea-outline');
-    map.moveLayer(`typhoon-points-${index}`, 'south-korea-outline');
-    map.moveLayer(`typhoon-points-${index}-active`, 'south-korea-outline');
-  }
+  // Ensure markers are above all other layers (맨 위로 이동)
+  map.moveLayer(`typhoon-route-${index}`);
+  map.moveLayer(`typhoon-points-${index}`);
+  map.moveLayer(`typhoon-points-${index}-active`);
 
   // Add click event for popup
   map.on('click', `typhoon-points-${index}`, (e) => {
     const clickedMarkerId = `typhoon-points-${index}`;
+    const clickedPointIndex = e.features[0].properties.pointIndex;
 
-    // Remove active state from previous marker
+    // Remove active state from previous marker (reset filter)
     if (activeMarkerId && activeMarkerId !== clickedMarkerId) {
-      map.setPaintProperty(`${activeMarkerId}-active`, 'circle-stroke-opacity', 0);
+      map.setFilter(`${activeMarkerId}-active`, ['==', 'pointIndex', -1]);
     }
 
-    // Set active state for clicked marker
+    // Set active state for clicked marker (show only the clicked point)
     activeMarkerId = clickedMarkerId;
-    map.setPaintProperty(`${clickedMarkerId}-active`, 'circle-stroke-opacity', 0.9);
+    map.setFilter(`${clickedMarkerId}-active`, [
+      '==',
+      'pointIndex',
+      clickedPointIndex,
+    ]);
     const coordinates = e.features[0].geometry.coordinates.slice();
     const infoPanel = document.getElementById('typhoon-info-panel');
     if (!infoPanel) return;
@@ -937,19 +688,36 @@ function addTyphoonToMap(typhoon, index, isVisible) {
     const isMobile = window.innerWidth <= 900;
 
     if (isMobile) {
-      // 모바일: 중앙에 위치, 적당한 줌
+      // 모바일: 바텀시트 높이를 고려하여 보이는 영역의 중앙에 마커 배치
+      const selectedInfoPanel = document.getElementById(
+        'selected-typhoon-info'
+      );
+      const bottomSheetHeight =
+        selectedInfoPanel && selectedInfoPanel.classList.contains('active')
+          ? selectedInfoPanel.offsetHeight
+          : 0;
+
+      // 바텀시트 높이만큼 위로 offset (보이는 지도 영역의 중앙)
+      const offsetY = bottomSheetHeight > 0 ? -(bottomSheetHeight / 4) : 0;
+
       map.flyTo({
         center: coordinates,
         zoom: 7,
+        offset: [0, offsetY],
         duration: 1500,
       });
 
-      // 모바일: 팝업을 화면 중앙에 고정
+      // 모바일: 팝업을 마커 위치 기준으로 표시 (flyTo 완료 후)
       setTimeout(() => {
+        const point = map.project(coordinates);
+        const popupWidth = infoPanel.offsetWidth || 350;
+        const popupHeight = infoPanel.offsetHeight || 200;
+
+        // 마커를 중앙에 두고 팝업을 마커 중앙에 배치
         infoPanel.style.position = 'absolute';
-        infoPanel.style.top = '50%';
-        infoPanel.style.left = '50%';
-        infoPanel.style.transform = 'translate(-50%, -50%)';
+        infoPanel.style.left = `${point.x - popupWidth / 2}px`;
+        infoPanel.style.top = `${point.y - popupHeight / 2}px`; // 마커 중앙
+        infoPanel.style.transform = 'none';
         infoPanel.style.display = 'block';
       }, 1600);
     } else {
@@ -1260,11 +1028,10 @@ function renderTop5Map(data) {
       },
     });
 
-    // Ensure layers are above Korea layers
-    if (mapTop5.getLayer('south-korea-outline')) {
-      mapTop5.moveLayer(`top5-route-${index}`, 'south-korea-outline');
-      mapTop5.moveLayer(`top5-label-${index}`, 'south-korea-outline');
-    }
+    // Ensure layers are above all other layers (맨 위로 이동)
+    // moveLayer without second argument moves to top
+    mapTop5.moveLayer(`top5-route-${index}`);
+    mapTop5.moveLayer(`top5-label-${index}`);
 
     setTimeout(() => {
       const source = mapTop5.getSource(routeSourceId);
@@ -1356,10 +1123,10 @@ function renderVideoMarkers(type) {
   // GeoJSON 데이터 생성
   const markersData = {
     type: 'FeatureCollection',
-    features: filteredVideos.map((video, index) => ({
+    features: filteredVideos.map((video) => ({
       type: 'Feature',
       properties: {
-        number: index + 1,
+        number: video.number, // Use original number from data
         title: video.title,
         date: video.date,
         thumbnail: video.thumbnail,
@@ -1420,7 +1187,7 @@ function renderVideoMarkers(type) {
         'Open Sans Bold',
         'Arial Unicode MS Bold',
       ],
-      'text-size': 20,
+      'text-size': 22,
       'text-anchor': 'center',
     },
     paint: {
@@ -1428,12 +1195,11 @@ function renderVideoMarkers(type) {
     },
   });
 
-  // Ensure markers are above Korea layers
-  if (mapVideos.getLayer('south-korea-outline')) {
-    mapVideos.moveLayer('video-markers', 'south-korea-outline');
-    mapVideos.moveLayer('video-markers-active', 'south-korea-outline');
-    mapVideos.moveLayer('video-markers-labels', 'south-korea-outline');
-  }
+  // Ensure markers are above all other layers (맨 위로 이동)
+  // moveLayer without second argument moves to top
+  mapVideos.moveLayer('video-markers');
+  mapVideos.moveLayer('video-markers-active');
+  mapVideos.moveLayer('video-markers-labels');
 
   // 클릭 이벤트 추가
   mapVideos.on('click', 'video-markers', (e) => {
@@ -1441,8 +1207,16 @@ function renderVideoMarkers(type) {
     const clickedNumber = properties.number;
 
     // Update active marker filter to show only the clicked marker
-    mapVideos.setFilter('video-markers-active', ['==', 'number', clickedNumber]);
-    mapVideos.setPaintProperty('video-markers-active', 'circle-stroke-opacity', 0.9);
+    mapVideos.setFilter('video-markers-active', [
+      '==',
+      'number',
+      clickedNumber,
+    ]);
+    mapVideos.setPaintProperty(
+      'video-markers-active',
+      'circle-stroke-opacity',
+      0.9
+    );
     activeVideoMarkerId = clickedNumber;
 
     // Create and dispatch a custom event
@@ -1484,9 +1258,9 @@ function setupPopupCloseEvents() {
   // Helper function to close popup and remove active marker state
   const closePopupAndResetActive = () => {
     infoPanel.style.display = 'none';
-    // Remove active state from marker
+    // Remove active state from marker (reset filter to show none)
     if (activeMarkerId) {
-      map.setPaintProperty(`${activeMarkerId}-active`, 'circle-stroke-opacity', 0);
+      map.setFilter(`${activeMarkerId}-active`, ['==', 'pointIndex', -1]);
       activeMarkerId = null;
     }
   };

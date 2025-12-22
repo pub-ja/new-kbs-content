@@ -1612,8 +1612,8 @@ function renderVideoSlider(type) {
     slidesPerView: 3,
     spaceBetween: 20,
     navigation: {
-      nextEl: '.cnt-swiper__button-next',
-      prevEl: '.cnt-swiper__button-prev',
+      nextEl: '.cnt-swiper__button next',
+      prevEl: '.cnt-swiper__button prev',
     },
     pagination: {
       el: '.cnt-swiper__pagination',
@@ -1624,7 +1624,7 @@ function renderVideoSlider(type) {
 
 function showVideoInfo(marker) {
   const videoInfoContainer = document.getElementById('video-info');
-  const typeText = marker.type === 'approaching' ? '업근 기록' : '피해 기록';
+  const typeText = marker.type === 'approaching' ? '접근 기록' : '피해 기록';
   const typeColor = marker.type === 'approaching' ? '#ffa500' : '#ff4444';
 
   videoInfoContainer.innerHTML = `
