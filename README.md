@@ -105,6 +105,8 @@ npx http-server
 - `top5DamageData` 등: Top 5 순위 데이터
 - `videoData[]`: 영상 메타데이터
 
+**중요**: 역대 태풍 API 개발 시, 아래 '사라' 태풍의 데이터 구조를 표준 형식으로 참조하시기 바랍니다.
+
 **데이터 구조 예시 (API 설계 시 참조 - 역대 태풍 '사라' 기준)**:
 
 ```javascript
@@ -264,3 +266,7 @@ npx http-server
 
 - [ ] **Console 로그 제거**
   - 개발 중 사용된 `console.log`를 제거하고, 필요한 에러 로깅(`console.error`)만 남겨두세요.
+
+- [ ] **임시 개발 파일 정리**
+  - `assets/images/temp/` - 개발용 샘플 이미지 (퍼블리싱 작업 시 필요, 프로덕션 배포 전 확인)
+  - `assets/js/temp/` - 개발용 테스트 파일 (퍼블리싱 작업 시 필요, 프로덕션 배포 전 확인)
