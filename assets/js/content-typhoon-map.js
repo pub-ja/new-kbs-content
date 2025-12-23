@@ -380,7 +380,7 @@ function addCurrentTyphoonToMap(typhoon) {
     source: 'typhoon-route-current-past',
     layout: { 'line-join': 'round', 'line-cap': 'round' },
     paint: {
-      'line-color': '#FF0000',
+      'line-color': '#353578',
       'line-width': 3,
       'line-opacity': 0.8,
     },

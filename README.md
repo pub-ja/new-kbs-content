@@ -52,7 +52,7 @@
 
 - **Mapbox GL JS v3.0.1** - 인터랙티브 3D 지도
 - **Swiper.js v12.0.3** - 터치 지원 캐러셀 슬라이더
-- **Spoqa Han Sans Neo** - 한글 최적화 웹폰트
+- **[Spoqa Han Sans Neo](https://spoqa.github.io/spoqa-han-sans/)** - 한글 최적화 웹폰트
 
 ## 프로젝트 구조
 
@@ -76,18 +76,9 @@ kbs-content-2025/
 
 ## 설치 및 실행
 
-### 1. 로컬 실행 (추천)
-
 이 프로젝트는 CORS 문제 없이 로컬 파일(`file://`)로도 실행 가능하도록 아이콘 로딩 방식이 처리되어 있습니다.
 
 1. `index.html` 파일을 브라우저(Chrome 권장)로 엽니다.
-
-### 2. 로컬 서버 실행
-
-```bash
-# Node.js 사용 시
-npx http-server
-```
 
 ## 개발 가이드
 
@@ -158,9 +149,20 @@ npx http-server
 - `renderTop5Map(data)`: Top 5 경로 애니메이션
 - `renderVideoMarkers(type)`: 영상 마커 표시
 
-**특이사항 (CORS 대응)**:
+**⚠️ 현재 태풍 시각화 스타일 확인 필요**:
 
-- 로컬 환경에서의 이미지 로딩 차단을 방지하기 위해, SVG 아이콘을 Base64 Data URI 형태로 코드 내에 포함하여 로드합니다 (`map.on('load')` 부분 참조). 서버 환경에서는 `map.loadImage()`로 변경하여 외부 파일을 로드해도 무방합니다.
+현재 태풍의 시각화 디자인은 기존 현황판의 Mapbox 스타일과 다를 수 있습니다.
+기존 현황판에서 사용 중인 Mapbox 스타일을 적용하려면 아래 위치의 코드를 수정해야 합니다:
+
+1. **현재 태풍 아이콘 및 색상** ([content-typhoon-map.js:361-559](assets/js/content-typhoon-map.js#L361-L559))
+   - 태풍의 눈 아이콘: Line 505 (`'icon-image': 'typhoon-strong'`)
+   - 과거 경로 색상: Line 383 (`'line-color': '#353578'`)
+   - 예상 경로 색상: Line 405 (`'line-color': '#FF4444'`)
+   - 강풍 반경 색상: Line 434, 460 (`circle-color`)
+
+2. **Mapbox Studio 스타일 사용 시** ([content-typhoon-map.js:90-142](assets/js/content-typhoon-map.js#L90-L142))
+   - 기존 현황판에서 Mapbox Studio로 관리하는 스타일이 있다면, Line 145의 `style` 속성을 Studio URL로 교체 가능
+   - 예: `style: 'mapbox://styles/YOUR_USERNAME/YOUR_STYLE_ID'`
 
 #### 3. content-typhoon-ui.js
 
