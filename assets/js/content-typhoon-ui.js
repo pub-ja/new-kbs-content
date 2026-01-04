@@ -1,6 +1,6 @@
 /**
- * @file UI component logic for the typhoon visualization page.
- * This includes tab navigation, custom selects, sliders, and other interactive elements.
+ * @file 태풍 시각화 페이지의 UI 컴포넌트 로직
+ * 탭 네비게이션, 커스텀 셀렉트, 슬라이더 및 기타 인터랙티브 요소 포함
  *
  *
  * 1. 파일 구조:
@@ -30,39 +30,39 @@
  */
 
 // ============================================================
-// GLOBAL UI STATE
+// 전역 UI 상태
 // ============================================================
 
 let currentTab = 'tabTyphoon1';
-let currentRankingType = null; // No default selection
+let currentRankingType = null; // 기본 선택 없음
 let videoSwiper = null;
 
-// Tracks which tabs have been visited to control overlay behavior
+// 오버레이 동작을 제어하기 위해 방문한 탭을 추적
 const tabVisited = {
-  tabTyphoon1: true, // Start on the first tab
+  tabTyphoon1: true, // 첫 번째 탭에서 시작
   tabTyphoon2: false,
   tabTyphoon3: false,
 };
 
-// Stores the open/closed state of map overlays
+// 지도 오버레이의 열림/닫힘 상태 저장
 const overlayStates = {
   mapOverlay1: true,
   mapOverlay2: true,
   mapOverlay3: true,
 };
 
-// ============================================ //
-// INITIALIZATION
-// ============================================ //
+// ============================================================
+// 초기화
+// ============================================================
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Initialize UI components for the default tab
+  // 기본 탭의 UI 컴포넌트 초기화
   if (currentTyphoon) {
     renderCurrentTyphoon(currentTyphoon);
   }
   setupTyphoonSelect();
 
-  // Initialize general UI handlers
+  // 일반 UI 핸들러 초기화
   initializeTabNavigation();
   initializeMobileBottomSheetLayout();
   initializeMobileBottomSheetToggle();
@@ -74,12 +74,12 @@ document.addEventListener('DOMContentLoaded', () => {
     updateMapHeight();
   }, 100);
 
-  // Set up UI for other tabs, which will be fully initialized on first click
+  // 다른 탭의 UI 설정 (첫 클릭 시 완전히 초기화됨)
   setupCustomSelect('rankingTypeSelect', handleRankingTypeChange);
-  // Do not initialize ranking type select with default selection
+  // 순위 타입 선택에 기본값 설정하지 않음
   setupCustomSelect('videoTyphoonSelect', (value) => {
-    // A typhoon has been selected from the dropdown.
-    // Make the video controls and slider visible (CSS 클래스로 통일)
+    // 드롭다운에서 태풍이 선택됨
+    // 비디오 컨트롤과 슬라이더를 표시 (CSS 클래스로 통일)
     const videoControls = document.querySelector(
       '#tabTyphoon3 .video-controls'
     );
@@ -87,12 +87,12 @@ document.addEventListener('DOMContentLoaded', () => {
       videoControls.classList.add('active');
     }
 
-    // Render map markers for the selected typhoon (default to 'approaching')
+    // 선택된 태풍의 지도 마커 렌더링 (기본값: 'approaching')
     if (typeof renderVideoMarkers === 'function') {
       renderVideoMarkers('approaching');
     }
 
-    // Programmatically click the 'approaching' tab to trigger initial render
+    // 초기 렌더링을 위해 프로그래밍 방식으로 'approaching' 탭 클릭
     const approachingTabButton = document.querySelector(
       '#tabTyphoon3 .cnt-panel-tab__button[data-video-type="approaching"]'
     );
@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   initializeVideoTabButtons();
 
-  // Set default text for video typhoon select trigger
+  // 비디오 태풍 선택의 기본 텍스트 설정
   const videoSelectTrigger = document.querySelector(
     '#videoTyphoonSelect .cnt-custom-select__text'
   );
@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updateMapHeight();
   });
 
-  // Add a listener for our custom event from the map
+  // 지도에서 발생하는 커스텀 이벤트 리스너 추가
   window.addEventListener('markerClick', (e) => {
     if (videoSwiper && typeof videoSwiper.slideTo === 'function') {
       videoSwiper.slideTo(e.detail.slideIndex);
@@ -124,34 +124,34 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// ============================================ //
-// TAB STICKY OBSERVER
-// ============================================ //
+// ============================================================
+// 탭 스티키 옵저버
+// ============================================================
 
 /**
- * Global state: tracks whether tab navigation is currently in sticky mode
+ * 전역 상태: 탭 네비게이션이 현재 스티키 모드인지 추적
  */
 let isStickyMode = false;
 
 /**
- * Observes scroll position to determine sticky state and updates layout accordingly.
- * Focuses only on state monitoring and visual adjustments (content-full class).
+ * 스크롤 위치를 감시하여 스티키 상태를 확인하고 그에 따라 레이아웃을 업데이트합니다.
+ * 상태 모니터링 및 시각적 조정(content-full 클래스)에만 집중합니다.
  */
 function initializeTabStickyObserver() {
   const tabNav = document.querySelector('.cnt-main-tab');
   if (!tabNav) return;
 
   const handleStickyState = () => {
-    // Get computed top value from CSS (sticky position top value)
+    // CSS에서 계산된 top 값 가져오기 (sticky position top value)
     const computedStyle = window.getComputedStyle(tabNav);
     const stickyTop = parseInt(computedStyle.top) || 0;
 
-    // Check if element has reached its sticky position
+    // 요소가 스티키 위치에 도달했는지 확인
     const rect = tabNav.getBoundingClientRect();
     const isSticky = rect.top <= stickyTop;
     const isMobile = window.innerWidth <= 900;
 
-    // Update global sticky state
+    // 전역 스티키 상태 업데이트
     isStickyMode = isSticky && isMobile;
 
     const activeContent = document.querySelector(
@@ -159,14 +159,14 @@ function initializeTabStickyObserver() {
     );
     if (!activeContent) return;
 
-    // Visual state management: add/remove content-full class
+    // 시각적 상태 관리: content-full 클래스 추가/제거
     if (isSticky) {
       activeContent.classList.add('content-full');
     } else {
       activeContent.classList.remove('content-full');
     }
 
-    // Panel state management: force expand when sticky, collapse when not
+    // 패널 상태 관리: 스티키일 때 강제 확장, 아닐 때 축소
     if (isMobile) {
       const panel = activeContent.querySelector('.cnt-info-panel');
       if (!panel) return;
@@ -179,10 +179,10 @@ function initializeTabStickyObserver() {
     }
   };
 
-  // Initial check
+  // 초기 확인
   handleStickyState();
 
-  // Update on scroll and resize
+  // 스크롤 및 리사이즈 시 업데이트
   window.addEventListener('scroll', () => {
     handleStickyState();
     updateMapHeight();
@@ -191,8 +191,8 @@ function initializeTabStickyObserver() {
 }
 
 /**
- * Initializes bottom sheet toggle and interaction handlers for mobile.
- * Centralized event management with state-aware behavior.
+ * 모바일용 바텀시트 토글 및 인터랙션 핸들러를 초기화합니다.
+ * 상태 인식 동작을 가진 중앙 집중식 이벤트 관리입니다.
  */
 function initializeMobileBottomSheetToggle() {
   const isMobile = window.innerWidth <= 900;
@@ -202,29 +202,29 @@ function initializeMobileBottomSheetToggle() {
     const handleWrapper = panel.querySelector('.cnt-panel-handle-wrapper');
 
     if (!isMobile) {
-      // Desktop: ensure expanded class is removed
+      // 데스크톱: expanded 클래스가 제거되었는지 확인
       panel.classList.remove('expanded');
       return;
     }
 
-    // Mobile: ensure initial state is collapsed
+    // 모바일: 초기 상태는 축소됨
     panel.classList.remove('expanded');
 
-    // Mark that listeners have been initialized to prevent duplicates
+    // 리스너가 이미 초기화되었는지 표시하여 중복 방지
     if (panel.dataset.listenersInitialized === 'true') {
       return;
     }
     panel.dataset.listenersInitialized = 'true';
 
-    // 1. Panel top click handler (state-aware)
+    // 1. 패널 상단 클릭 핸들러 (상태 인식)
     if (panelTop) {
       panelTop.addEventListener('click', (e) => {
-        // Ignore clicks on drag handle
+        // 드래그 핸들 클릭 무시
         if (handleWrapper && handleWrapper.contains(e.target)) {
           return;
         }
 
-        // Only toggle if NOT in sticky mode
+        // 스티키 모드가 아닐 때만 토글
         if (!isStickyMode) {
           const isExpanded = panel.classList.contains('expanded');
           if (isExpanded) {
@@ -233,11 +233,11 @@ function initializeMobileBottomSheetToggle() {
             expandBottomSheet(panel);
           }
         }
-        // In sticky mode, panel should always stay expanded (do nothing)
+        // 스티키 모드에서는 패널이 항상 확장 상태 유지 (아무것도 안 함)
       });
     }
 
-    // 2. Auto-expand on internal control clicks
+    // 2. 내부 컨트롤 클릭 시 자동 확장
     const customSelects = panel.querySelectorAll('.cnt-custom-select__trigger');
     customSelects.forEach((trigger) => {
       trigger.addEventListener(
@@ -248,7 +248,7 @@ function initializeMobileBottomSheetToggle() {
           }
         },
         { capture: true }
-      ); // Use capture phase to run before other handlers
+      ); // 캡처 단계 사용하여 다른 핸들러보다 먼저 실행
     });
 
     const panelTabButtons = panel.querySelectorAll('.cnt-panel-tab__button');
@@ -261,18 +261,18 @@ function initializeMobileBottomSheetToggle() {
           }
         },
         { capture: true }
-      ); // Use capture phase to run before other handlers
+      ); // 캡처 단계 사용하여 다른 핸들러보다 먼저 실행
     });
   });
 }
 
-// ============================================ //
-// TAB 1: CURRENT VS. HISTORICAL
-// ============================================ //
+// ============================================================
+// 탭 1: 현재 태풍 vs 역대 태풍
+// ============================================================
 
 /**
- * Renders the info box for the current typhoon.
- * @param {Object} typhoon The current typhoon data object.
+ * 현재 태풍의 정보 박스를 렌더링합니다.
+ * @param {Object} typhoon 현재 태풍 데이터 객체
  */
 function renderCurrentTyphoon(typhoon) {
   const container = document.getElementById('current-typhoon-section');
@@ -283,14 +283,14 @@ function renderCurrentTyphoon(typhoon) {
   const textEl = container.querySelector('.cnt-current-typhoon__text');
 
   if (!typhoon) {
-    // No typhoon: remove active class and update content
+    // 태풍 없음: active 클래스 제거 및 내용 업데이트
     if (typhoonItem) typhoonItem.classList.remove('active');
     if (iconEl) iconEl.textContent = '';
     if (textEl) textEl.textContent = '발생 태풍 없음';
     return;
   }
 
-  // Active typhoon: add active class and update content
+  // 활성 태풍: active 클래스 추가 및 내용 업데이트
   if (typhoonItem) typhoonItem.classList.add('active');
   if (iconEl) iconEl.textContent = '진행 중';
   if (textEl)
@@ -298,14 +298,14 @@ function renderCurrentTyphoon(typhoon) {
 }
 
 /**
- * Sets up the event listeners for the historical typhoon dropdown select.
+ * 역대 태풍 드롭다운 선택의 이벤트 리스너를 설정합니다.
  */
 function setupTyphoonSelect() {
   const infoContainer = document.getElementById('selectedTyphoonInfo');
 
-  // This uses the shared setupCustomSelect function
+  // 공유 setupCustomSelect 함수 사용
   setupCustomSelect('typhoon-select', (selectedIndex) => {
-    // Validate data availability
+    // 데이터 사용 가능 여부 확인
     if (typeof typhoons === 'undefined' || !Array.isArray(typhoons)) {
       console.error('Typhoons data not available');
       return;
@@ -318,13 +318,13 @@ function setupTyphoonSelect() {
     const typhoon = typhoons[selectedIndex];
     if (!typhoon) return;
 
-    // Close the map popup when changing selection
+    // 선택 변경 시 지도 팝업 닫기
     const infoPanel = document.getElementById('typhoonInfoPanel');
     if (infoPanel) {
       infoPanel.style.display = 'none';
     }
 
-    // Reset active marker state when changing selection
+    // 선택 변경 시 활성 마커 상태 초기화
     if (
       typeof activeMarkerId !== 'undefined' &&
       activeMarkerId &&
@@ -334,16 +334,16 @@ function setupTyphoonSelect() {
       activeMarkerId = null;
     }
 
-    // Display info for the selected typhoon
+    // 선택된 태풍의 정보 표시
     infoContainer.classList.add('active');
     const textParagraphs = infoContainer.querySelectorAll('.cnt-panel-text');
 
     if (textParagraphs.length >= 1) {
-      // Update paragraph with description from data
+      // 데이터에서 설명을 가져와 단락 업데이트
       textParagraphs[0].textContent = typhoon.description || '';
     }
 
-    // Calculate map bounds to fit both current and selected typhoons
+    // 현재 태풍과 선택된 태풍이 모두 보이도록 지도 범위 계산
     const bounds = new mapboxgl.LngLatBounds();
     if (typhoon.path && Array.isArray(typhoon.path)) {
       typhoon.path.forEach((coord) => bounds.extend(coord));
@@ -356,21 +356,21 @@ function setupTyphoonSelect() {
       currentTyphoon.path.forEach((p) => bounds.extend(p.coord));
     }
 
-    // Hide all other historical paths and disable click events
+    // 다른 모든 역대 태풍 경로 숨기고 클릭 이벤트 비활성화
     typhoons.forEach((_, i) => {
       if (map.getLayer(`typhoon-route-${i}`)) {
         map.setPaintProperty(`typhoon-route-${i}`, 'line-opacity', 0);
       }
       setMarkerOpacity(`typhoon-points-${i}`, 0);
 
-      // Disable pointer events for all layers
+      // 모든 레이어의 포인터 이벤트 비활성화
       const layer = map.getLayer(`typhoon-points-${i}`);
       if (layer) {
         map.setLayoutProperty(`typhoon-points-${i}`, 'visibility', 'none');
       }
     });
 
-    // Keep current typhoon visible but slightly faded
+    // 현재 태풍은 표시하되 약간 흐리게 유지
     if (currentTyphoon && map.getLayer('typhoon-route-current-past')) {
       map.setPaintProperty('typhoon-route-current-past', 'line-opacity', 0.6);
     }
@@ -396,10 +396,10 @@ function setupTyphoonSelect() {
           maxZoom: 8,
         });
 
-        // Animate the selected typhoon's path after the map moves
+        // 지도 이동 후 선택된 태풍의 경로 애니메이션
         setTimeout(() => {
           animateTyphoonRoute(parseInt(selectedIndex));
-          // Enable click events only for the selected typhoon
+          // 선택된 태풍에만 클릭 이벤트 활성화
           const selectedLayer = map.getLayer(`typhoon-points-${selectedIndex}`);
           if (selectedLayer) {
             map.setLayoutProperty(
@@ -422,10 +422,10 @@ function setupTyphoonSelect() {
       maxZoom: 8,
     });
 
-    // Animate the selected typhoon's path after the map moves
+    // 지도 이동 후 선택된 태풍의 경로 애니메이션
     setTimeout(() => {
       animateTyphoonRoute(parseInt(selectedIndex));
-      // Enable click events only for the selected typhoon
+      // 선택된 태풍에만 클릭 이벤트 활성화
       const selectedLayer = map.getLayer(`typhoon-points-${selectedIndex}`);
       if (selectedLayer) {
         map.setLayoutProperty(
@@ -438,18 +438,18 @@ function setupTyphoonSelect() {
   });
 }
 
-// ============================================ //
-// TAB 2: TOP 5 TYPHOONS
-// ============================================ //
+// ============================================================
+// 탭 2: TOP 5 태풍
+// ============================================================
 
 /**
- * Handles the change event for the ranking type selector on Tab 2.
- * @param {'wind' | 'damage' | 'casualties'} type The selected ranking criterion.
+ * 탭 2의 순위 타입 선택기 변경 이벤트를 처리합니다.
+ * @param {'wind' | 'damage' | 'casualties'} type 선택된 순위 기준
  */
 function handleRankingTypeChange(type) {
   currentRankingType = type;
 
-  // Show the result panel when a selection is made (CSS 클래스로 통일)
+  // 선택이 이루어지면 결과 패널 표시 (CSS 클래스로 통일)
   const resultPanel = document.querySelector('#tabTyphoon2 .cnt-panel-result');
   if (resultPanel) {
     resultPanel.classList.add('active');
@@ -479,13 +479,13 @@ function handleRankingTypeChange(type) {
     data = top5CasualtiesData;
   }
 
-  // Update both the map and the list
+  // 지도와 리스트 모두 업데이트
   renderTop5Map(data);
   renderTop5List(data);
 }
 
 /**
- * Renders the list of top 5 typhoons in the info panel.
+ * 정보 패널에 Top 5 태풍 리스트를 렌더링합니다.
  *
  * [API 연동 가이드]
  * - 현재: Mock 데이터(typhoons 배열)를 정렬하여 렌더링
@@ -504,14 +504,14 @@ function handleRankingTypeChange(type) {
  *   ...
  * ]
  *
- * @param {Array<Object>} data The sorted and sliced array of top 5 typhoons.
+ * @param {Array<Object>} data 정렬되고 슬라이스된 Top 5 태풍 배열
  */
 function renderTop5List(data) {
   const listContainer = document.getElementById('topTyphoonList');
   if (!listContainer) return;
 
   // [MOCK DATA - API 연동 시 이 함수 전체를 API 호출로 교체]
-  listContainer.innerHTML = ''; // Clear the list before rendering
+  listContainer.innerHTML = ''; // 렌더링 전 리스트 초기화
 
   data.forEach((typhoon) => {
     let value, unit;
@@ -520,7 +520,7 @@ function renderTop5List(data) {
       value = typhoon.wind.toFixed(1);
       unit = 'm/s';
     } else if (currentRankingType === 'damage') {
-      // Value is expected to be in 100 million Won units.
+      // 값은 억원 단위로 제공됨
       value = typhoon.damage.toLocaleString();
       unit = '억원';
     } else if (currentRankingType === 'casualties') {
@@ -545,12 +545,12 @@ function renderTop5List(data) {
   });
 }
 
-// ============================================ //
-// TAB 3: TYPHOON VIDEOS
-// ============================================ //
+// ============================================================
+// 탭 3: 태풍 영상
+// ============================================================
 
 /**
- * Sets up event listeners for the video type tabs (approaching/damage).
+ * 영상 타입 탭(접근/피해)의 이벤트 리스너를 설정합니다.
  */
 function initializeVideoTabButtons() {
   const videoTabBtns = document.querySelectorAll(
@@ -570,7 +570,7 @@ function initializeVideoTabButtons() {
 }
 
 /**
- * Renders the Swiper.js slider for typhoon videos.
+ * 태풍 영상을 위한 Swiper.js 슬라이더를 렌더링합니다.
  *
  * ============================================================
  * [Mapbox Studio / API 연동 가이드]
@@ -632,7 +632,7 @@ function initializeVideoTabButtons() {
  *   }
  * ]
  *
- * @param {'approaching' | 'damage'} type The type of videos to display.
+ * @param {'approaching' | 'damage'} type 표시할 영상 타입
  */
 function renderVideoSlider(type) {
   const sliderWrapper = document.querySelector(
@@ -698,12 +698,12 @@ function renderVideoSlider(type) {
   });
 }
 
-// ============================================ //
-// GENERAL UI & NAVIGATION
-// ============================================ //
+// ============================================================
+// 일반 UI 및 네비게이션
+// ============================================================
 
 /**
- * Initializes the main tab navigation.
+ * 메인 탭 네비게이션을 초기화합니다.
  */
 function initializeTabNavigation() {
   document.querySelectorAll('.cnt-main-tab__button').forEach((btn) => {
@@ -714,14 +714,14 @@ function initializeTabNavigation() {
 }
 
 /**
- * Switches the view to the selected tab.
- * @param {string} tabId The ID of the tab to switch to.
+ * 선택한 탭으로 뷰를 전환합니다.
+ * @param {string} tabId 전환할 탭의 ID
  */
 function switchTab(tabId) {
   if (currentTab === tabId) return;
   currentTab = tabId;
 
-  // Update button and content visibility
+  // 버튼 및 컨텐츠 표시 상태 업데이트
   document.querySelectorAll('.cnt-main-tab__button').forEach((btn) => {
     btn.classList.toggle('active', btn.dataset.tab === tabId);
   });
@@ -729,17 +729,17 @@ function switchTab(tabId) {
     content.classList.toggle('active', content.id === tabId);
   });
 
-  // Transfer content-full class to new active tab if in sticky mode
+  // 스티키 모드인 경우 새 활성 탭으로 content-full 클래스 이전
   const tabNav = document.querySelector('.cnt-main-tab');
   if (tabNav) {
     const isSticky = tabNav.getBoundingClientRect().top <= 0;
 
-    // Remove content-full from all tabs
+    // 모든 탭에서 content-full 제거
     document.querySelectorAll('.cnt-main-tab__content').forEach((content) => {
       content.classList.remove('content-full');
     });
 
-    // Add content-full to new active tab if sticky
+    // 스티키 상태면 새 활성 탭에 content-full 추가
     if (isSticky) {
       const activeContent = document.querySelector(
         '.cnt-main-tab__content.active'
@@ -771,7 +771,7 @@ function switchTab(tabId) {
     }
   }
 
-  // Expand overlay on first visit
+  // 첫 방문 시 오버레이 확장
   setTimeout(() => {
     if (!tabVisited[tabId]) {
       tabVisited[tabId] = true;
@@ -784,9 +784,9 @@ function switchTab(tabId) {
     }
   }, 0);
 
-  // Initialize map if it doesn't exist yet
+  // 지도가 아직 없으면 초기화
   if (tabId === 'tabTyphoon2') {
-    // Remove active class if no selection (CSS 클래스로 통일)
+    // 선택이 없으면 active 클래스 제거 (CSS 클래스로 통일)
     const resultPanel = document.querySelector(
       '#tabTyphoon2 .cnt-panel-result'
     );
@@ -796,7 +796,7 @@ function switchTab(tabId) {
 
     if (!mapTop5) {
       initMapTop5(() => {
-        // Only render data if a ranking type has been selected
+        // 순위 타입이 선택된 경우에만 데이터 렌더링
         if (currentRankingType) {
           setTimeout(() => {
             handleRankingTypeChange(currentRankingType);
@@ -804,12 +804,12 @@ function switchTab(tabId) {
         }
       });
     } else if (currentRankingType) {
-      // Only render data if a ranking type has been selected
+      // 순위 타입이 선택된 경우에만 데이터 렌더링
       handleRankingTypeChange(currentRankingType);
     }
   } else if (tabId === 'tabTyphoon3' && !mapVideos) initMapVideos();
 
-  // Resize map to fit new container dimensions
+  // 새 컨테이너 크기에 맞게 지도 리사이즈
   setTimeout(() => {
     updateMapHeight();
     if (tabId === 'tabTyphoon1' && map) map.resize();
@@ -819,7 +819,7 @@ function switchTab(tabId) {
 }
 
 /**
- * Sets up a generic custom select dropdown.
+ * 범용 커스텀 셀렉트 드롭다운을 설정합니다.
  *
  * [개발 권장사항]
  * - 드롭다운 옵션은 HTML에서 직접 관리하는 것을 권장
@@ -842,8 +842,8 @@ function switchTab(tabId) {
  * - 옵션을 동적으로 생성해야 한다면 innerHTML로 옵션 리스트 생성
  * - 또는 React의 경우 컴포넌트로 변환하여 map() 사용
  *
- * @param {string} selectId The ID of the select element.
- * @param {Function} onSelectCallback A callback function executed on selection.
+ * @param {string} selectId 셀렉트 요소의 ID
+ * @param {Function} onSelectCallback 선택 시 실행될 콜백 함수
  */
 function setupCustomSelect(selectId, onSelectCallback) {
   const customSelect = document.getElementById(selectId);
@@ -856,7 +856,7 @@ function setupCustomSelect(selectId, onSelectCallback) {
 
   function calculateDropdownPosition() {
     const rect = customSelect.getBoundingClientRect();
-    const dropdownHeight = 280; // from CSS
+    const dropdownHeight = 280; // CSS에서 가져옴
     if (
       window.innerHeight - rect.bottom < dropdownHeight &&
       rect.top > dropdownHeight
@@ -884,15 +884,15 @@ function setupCustomSelect(selectId, onSelectCallback) {
         '.cnt-custom-select__option-text'
       ).textContent;
 
-      // Remove selected class from all options
+      // 모든 옵션에서 selected 클래스 제거
       options.forEach((opt) => opt.classList.remove('selected'));
-      // Add selected class to clicked option
+      // 클릭한 옵션에 selected 클래스 추가
       option.classList.add('selected');
 
-      // Add selected class to trigger
+      // 트리거에 selected 클래스 추가
       selectTrigger.classList.add('selected');
 
-      // For the first tab's select, we keep the color indicator
+      // 첫 번째 탭의 셀렉트는 색상 표시기 유지
       if (selectId === 'typhoon-select') {
         const colorIndicator = option.querySelector(
           '.cnt-color-indicator'
@@ -916,7 +916,7 @@ function setupCustomSelect(selectId, onSelectCallback) {
 }
 
 /**
- * Initializes the toggle functionality for map overlays.
+ * 지도 오버레이의 토글 기능을 초기화합니다.
  */
 function initMapOverlays() {
   document.querySelectorAll('.cnt-map-overlay__toggle').forEach((toggleBtn) => {
@@ -943,7 +943,7 @@ function initMapOverlays() {
 }
 
 /**
- * Collapses all map overlays, e.g., after a user action.
+ * 모든 지도 오버레이를 축소합니다 (예: 사용자 액션 후).
  */
 function collapseOverlaysOnAction() {
   document.querySelectorAll('.cnt-map-overlay').forEach((overlay) => {
@@ -953,7 +953,7 @@ function collapseOverlaysOnAction() {
 }
 
 /**
- * Resizes the current active map instance based on the current tab.
+ * 현재 탭을 기준으로 활성 지도 인스턴스를 리사이즈합니다.
  */
 function resizeCurrentMap() {
   if (currentTab === 'tabTyphoon1' && typeof map !== 'undefined' && map) {
@@ -974,8 +974,8 @@ function resizeCurrentMap() {
 }
 
 /**
- * Updates map section height based on bottom sheet height.
- * Optimized with requestAnimationFrame for smooth transitions.
+ * 바텀시트 높이를 기준으로 지도 섹션 높이를 업데이트합니다.
+ * requestAnimationFrame으로 최적화하여 부드러운 전환을 제공합니다.
  */
 function updateMapHeight() {
   if (window.innerWidth > 900) {
@@ -1021,8 +1021,8 @@ function updateMapHeight() {
 }
 
 /**
- * Expands the bottom sheet to full height with optimized timing.
- * Coordinates CSS transitions with map height updates for smooth visuals.
+ * 바텀시트를 전체 높이로 확장합니다. 최적화된 타이밍 적용.
+ * CSS 전환과 지도 높이 업데이트를 조율하여 부드러운 시각 효과를 제공합니다.
  */
 function expandBottomSheet(panel) {
   panel.classList.add('expanded');
@@ -1045,7 +1045,7 @@ function expandBottomSheet(panel) {
 }
 
 /**
- * Collapses the bottom sheet to show only panel-top with optimized timing.
+ * 바텀시트를 축소하여 panel-top만 표시합니다.
  */
 function collapseBottomSheet(panel) {
   panel.classList.remove('expanded');
@@ -1057,13 +1057,13 @@ function collapseBottomSheet(panel) {
 }
 
 /**
- * Initializes the draggable bottom sheet layout for mobile viewports.
+ * 모바일 뷰포트용 드래그 가능한 바텀시트 레이아웃을 초기화합니다.
  */
 function initializeMobileBottomSheetLayout() {
   if (window.innerWidth > 900) {
     document.querySelectorAll('.cnt-info-panel').forEach((panel) => {
-      panel.style.height = ''; // Restore original height
-      panel.style.maxHeight = ''; // Clear maxHeight
+      panel.style.height = ''; // 원래 높이 복원
+      panel.style.maxHeight = ''; // maxHeight 초기화
     });
     return;
   }

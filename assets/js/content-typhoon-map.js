@@ -807,7 +807,7 @@ function animateTyphoonRoute(routeIndex) {
   const animationDuration = 3000;
   let startTime = performance.now();
 
-  // Calculate segment lengths for smooth interpolation
+  // 애니메이션이 자연스럽게 보이도록 마커와 마커 사이 길이 계산
   const segmentLengths = [];
   let totalLength = 0;
   for (let i = 0; i < fullPath.length - 1; i++) {
